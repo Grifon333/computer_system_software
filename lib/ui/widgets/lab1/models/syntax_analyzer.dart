@@ -2,8 +2,6 @@ import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
 import 'package:computer_system_software/ui/widgets/lab1/extensions.dart';
 import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
 
-// TODO: Add all exception
-
 class SyntaxAnalyzer {
   final Automata _automata;
   final List<Token> _tokens;
@@ -37,11 +35,14 @@ class SyntaxAnalyzer {
       List<String> nextStates = rules[currentState] ?? [];
       if (!nextStates.contains(nextToken)) {
         _handleException(currentState, token);
+      } else {
+        if (token.type == TokenType.rightBracket ||
+            token.type == TokenType.leftBracket) {
+          _bracketCheck(token);
+        }
+        currentState = nextToken;
+        _index++;
       }
-      if (token.type == TokenType.rightBracket ||
-          token.type == TokenType.leftBracket) _bracketCheck(token);
-      currentState = nextToken;
-      _index++;
     }
     for (Token token in _bracketsStack.reversed) {
       String value = token.value;
@@ -56,21 +57,66 @@ class SyntaxAnalyzer {
 
   void _handleException(String curState, Token token) {
     String nextToken = token.type.name;
-    if (_isAddVariableException(curState, nextToken)) {
+    if ((curState == _automata.startState &&
+            (nextToken == mult_div_pow || nextToken == factorial)) ||
+        curState == plus_minus ||
+        curState == mult_div_pow ||
+        curState == leftBracket) {
       _insertToken(TokenType.number_variable, _makeVariable());
-      _onAddException(token.position, 'Need add variable');
-    } else if (_isAddOperatorException(curState)) {
-      _insertToken(TokenType.plus_minus, '+');
-      _onAddException(token.position, 'Need add operation');
+      _onAddException(
+        token.position,
+        'Need to add a variable before the \'${token.value}\' sign',
+      );
     } else if (curState == _automata.startState && nextToken == rightBracket) {
-      _newTokens.removeAt(_index--);
-      _onAddException(token.position, 'Remove right bracket');
+      _newTokens.removeAt(_index);
+      _onAddException(
+        token.position,
+        'Remove the right bracket \'${token.value}\'',
+      );
+    } else if (curState == num_var ||
+        (curState == factorial && nextToken != factorial) ||
+        curState == rightBracket) {
+      _insertToken(TokenType.plus_minus, '+');
+      _onAddException(
+        token.position,
+        'Need to add an operation before the \'${token.value}\' sign',
+      );
+    } else if (curState == factorial && nextToken == factorial) {
+      _newTokens.removeAt(_index);
+      _onAddException(
+        token.position,
+        'Remove the factorial sign',
+      );
+    } else if (curState == function) {
+      String fun = _newTokens[_index - 1].value;
+      String expOpMsg = '';
+      bool factExist = nextToken == factorial;
+      List<(TokenType, String)> tokens = [];
+      tokens.add((TokenType.leftBracket, '('));
+      tokens.add((TokenType.number_variable, _makeVariable()));
+      tokens.add((TokenType.rightBracket, ')'));
+      if (factExist) {
+        tokens.add((TokenType.rightBracket, ')'));
+        _insertToken(TokenType.leftBracket, '(', _index - 1);
+        _bracketsStack.add(
+          const Token(type: TokenType.leftBracket, value: '(', position: 0),
+        );
+      }
+      if (nextToken == num_var || nextToken == function) {
+        tokens.add((TokenType.plus_minus, '+'));
+        expOpMsg = ' and an operation before the \'${token.value}\' sign';
+      }
+      _insertAllTokens(tokens, factExist ? ++_index : _index);
+      _onAddException(
+        token.position,
+        'Need to add a variable for the \'$fun\' function$expOpMsg',
+      );
     }
   }
 
-  void _insertToken(TokenType type, String value) {
+  void _insertToken(TokenType type, String value, [int? index]) {
     _newTokens.insert(
-      _index++,
+      index ?? _index,
       Token(
         type: type,
         value: value,
@@ -80,18 +126,18 @@ class SyntaxAnalyzer {
     );
   }
 
-  bool _isAddVariableException(String curState, String nextToken) {
-    return (curState == _automata.startState &&
-            (nextToken == mult_div_pow || nextToken == factorial)) ||
-        curState == plus_minus ||
-        curState == mult_div_pow ||
-        curState == leftBracket;
-  }
-
-  bool _isAddOperatorException(String curState) {
-    return curState == num_var ||
-        curState == factorial ||
-        curState == rightBracket;
+  void _insertAllTokens(List<(TokenType, String)> tokens, [int? index]) {
+    _newTokens.insertAll(
+      index ?? _index,
+      tokens.map(
+        (e) => Token(
+          type: e.$1,
+          value: e.$2,
+          position: 0,
+          visibleType: TokenVisibleType.inner,
+        ),
+      ),
+    );
   }
 
   String _makeVariable() {
@@ -115,6 +161,6 @@ class SyntaxAnalyzer {
       return;
     }
     _onAddException(token.position, 'Remove bracket');
-    _newTokens.removeAt(_index--);
+    _newTokens.removeAt(_index);
   }
 }

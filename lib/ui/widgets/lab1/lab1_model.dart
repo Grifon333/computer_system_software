@@ -11,6 +11,7 @@ class Lab1Model extends ChangeNotifier {
   void checkExpressions() {
     results.clear();
     for (String line in _data.split('\n')) {
+      if (line.isEmpty) continue;
       results.add(_checkExpression(line.trim()));
     }
     notifyListeners();
