@@ -1,0 +1,7 @@
+sin(x) + 3.1.4 * cos(y) - log(10) / 2 ^ x
+
+a-+(t*5.81.8 - ))/
+
+a+b*(c*cos(t-a*x)-d*sin(t+a*x)/(4.81*k-q*t))/(d*cos(t+a*y/f1(5.616*x-t))+c*sin(t-a*y*(u-v*i)))
+
+[(a+b)-c
