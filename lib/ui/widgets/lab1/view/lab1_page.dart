@@ -1,5 +1,5 @@
 import 'package:computer_system_software/ui/widgets/lab1/lab1_model.dart';
-import 'package:computer_system_software/ui/widgets/lab1/token.dart';
+import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,10 +27,6 @@ class _BodyWidget extends StatelessWidget {
       child: ListView(
         children: [
           TextField(
-            controller: TextEditingController(
-              text:
-                  'sin(x) + 3.1.4 * cos(y) - log(10) / 2 ^ x\na-+(t*5.81.8 - ))/\na+b*(c*cos(t-a*x)-d*sin(t+a*x)/(4.81*k-q*t))/(d*cos(t+a*y/f1(5.616*x-t))+c*sin(t-a*y*(u-v*i)))',
-            ),
             minLines: 7,
             maxLines: 7,
             decoration: const InputDecoration(
@@ -147,8 +143,6 @@ class _CheckResultWidget extends StatelessWidget {
   }
 
   TextStyle _getTextStyle(TokenVisibleType type) {
-
-
     switch (type) {
       case TokenVisibleType.init:
         return initStyle;
@@ -189,8 +183,7 @@ class _CheckResultWidget extends StatelessWidget {
             ),
             RichText(
               text: TextSpan(
-                children:
-                result.correctExpression
+                children: result.correctExpression
                     .map(
                       (e) => TextSpan(
                         text: e.value,

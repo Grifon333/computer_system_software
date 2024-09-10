@@ -1,5 +1,5 @@
 import 'package:computer_system_software/ui/widgets/lab1/extensions.dart';
-import 'package:computer_system_software/ui/widgets/lab1/token.dart';
+import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
 
 class LexicalAnalyzer {
   int _index = 0;
@@ -24,11 +24,17 @@ class LexicalAnalyzer {
       } else if (charMap.containsKey(char)) {
         tokens.add(_makeToken(charMap[char]!, char));
         _index++;
+      } else if (char.isLeftBracket) {
+        tokens.add(_makeToken(TokenType.leftBracket, char));
+        _index++;
+      } else if (char.isRightBracket) {
+        tokens.add(_makeToken(TokenType.rightBracket, char));
+        _index++;
       } else {
         onAddException(_index++, 'Undefine character: \'$char\'');
       }
     }
-    tokens.add(_makeToken(TokenType.eof, ' '));
+    tokens.add(_makeToken(TokenType.eof, ''));
     return tokens;
   }
 

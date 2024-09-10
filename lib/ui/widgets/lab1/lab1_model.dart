@@ -1,14 +1,8 @@
-import 'package:computer_system_software/ui/widgets/lab1/automata.dart';
-import 'package:computer_system_software/ui/widgets/lab1/lexical_analyzer.dart';
-import 'package:computer_system_software/ui/widgets/lab1/syntax_analyzer.dart';
-import 'package:computer_system_software/ui/widgets/lab1/token.dart';
+import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
+import 'package:computer_system_software/ui/widgets/lab1/models/lexical_analyzer.dart';
+import 'package:computer_system_software/ui/widgets/lab1/models/syntax_analyzer.dart';
+import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
 import 'package:flutter/material.dart';
-
-/*
-sin(x) + 3.1.4 * cos(y) - log(10) / 2 ^ x
-a-+(t*5.81.8 - ))/
-a+b*(c*cos(t-a*x)-d*sin(t+a*x)/(4.81*k-q*t))/(d*cos(t+a*y/f1(5.616*x-t))+c*sin(t-a*y*(u-v*i)))
- */
 
 class Lab1Model extends ChangeNotifier {
   String _data = '';

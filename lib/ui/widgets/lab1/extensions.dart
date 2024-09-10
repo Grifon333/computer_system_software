@@ -5,12 +5,30 @@ extension CheckCharacters on String {
 
   bool get isLetterOrDigit => isLetter || isDigit;
 
-  bool get isFunction =>
-      ['sin', 'cos', 'tan', 'cot', 'log', 'ln', 'sqrt', 'exp'].contains(this);
+  bool get isFunction => functions.contains(this);
 
   bool get isPoint => ['.', ','].contains(this);
 
   bool get isUndefineChar => !isLetterOrDigit && !'+-*/^!()., '.contains(this);
 
-  bool get isBracket => '()'.contains(this);
+  bool get isLeftBracket => '([{'.contains(this);
+
+  bool get isRightBracket => ')]}'.contains(this);
+
+  bool get isBracket => isLeftBracket || isRightBracket;
 }
+
+const List<String> functions = [
+  'sin',
+  'cos',
+  'tan',
+  'cot',
+  'log',
+  'log2',
+  'ln',
+  'lg',
+  'log10',
+  'ln',
+  'sqrt',
+  'exp'
+];

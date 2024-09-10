@@ -54,6 +54,4 @@ Map<String, TokenType> charMap = {
   '/': TokenType.multiple_divide_power,
   '^': TokenType.multiple_divide_power,
   '!': TokenType.factorial,
-  '(': TokenType.leftBracket,
-  ')': TokenType.rightBracket,
 };

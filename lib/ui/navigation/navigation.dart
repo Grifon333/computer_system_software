@@ -1,5 +1,5 @@
 import 'package:computer_system_software/ui/widgets/lab1/lab1_model.dart';
-import 'package:computer_system_software/ui/widgets/lab1/lab1_page.dart';
+import 'package:computer_system_software/ui/widgets/lab1/view/lab1_page.dart';
 import 'package:computer_system_software/ui/widgets/main_screen/main_screen.dart';
 import 'package:provider/provider.dart';
 
