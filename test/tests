@@ -1,0 +1,46 @@
+*a              : X1*a
+!+a             : X1!+a
+)+a             : +a
+
+a a             : a+a
+a.a             : a+a
+a.(a+a)         : a+(a+a)
+a (a+a)         : a+(a+a)
+a sin(x)        : a+sin(x)
+
+a+              : a+X1
+a++             : a+X1+X2
+a+/a            : a+X1/a
+a+!             : a+X1!
+(a+)            : (a+X1)
+
+a^              : a^X1
+a/*             : a/X1*X2
+a/^a            : a/X1^a
+a*!             : a*X1!
+(a*)            : (a*X1)
+
+a!a             : a!+a
+a!!             : a!
+a!(             : a!+(X1)
+a!(a+a)         : a!+(a+a)
+a!sin(a)        : a!+sin(a)
+
+(*a)            : (X1*a)
+(!+a)           : (X1!+a)
+()+a            : (X1)+a
+()              : (X1)
+a+(             : a+(X1)
+
+(a+a)a          : (a+a)+a
+(a+a)(a-a)      : (a+a)+(a-a)
+(a+a)f1(a)      : (a+a)+f1(a)
+
+sin a           : sin(X1)+a
+sin+            : sin(X1)+X2
+sin/            : sin(X1)/X2
+sin!            : (sin(X1))!
+(sin)           : (sin(X1))
+sin)            : sin(X1)
+sin ln          : sin(X1)+ln(X2)
+sin             : sin(X1)
