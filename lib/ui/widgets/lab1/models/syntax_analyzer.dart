@@ -10,10 +10,15 @@ class SyntaxAnalyzer {
   final List<Token> _bracketsStack = [];
   int _index = 0;
   int _lastVariableIndex = 1;
-  final Map<String, String> _brackets = {
+  final Map<String, String> _bracketsRtoL = {
     ')': '(',
     ']': '[',
     '}': '{',
+  };
+  final Map<String, String> _bracketsLtoR = {
+    '(': ')',
+    '[': ']',
+    '{': '}',
   };
 
   SyntaxAnalyzer({
@@ -35,20 +40,24 @@ class SyntaxAnalyzer {
       List<String> nextStates = rules[currentState] ?? [];
       if (!nextStates.contains(nextToken)) {
         _handleException(currentState, token);
-      } else {
-        if (token.type == TokenType.rightBracket ||
-            token.type == TokenType.leftBracket) {
-          _bracketCheck(token);
-        }
-        currentState = nextToken;
-        _index++;
+        continue;
       }
+      if (token.type == TokenType.rightBracket ||
+          token.type == TokenType.leftBracket) {
+        if (_bracketCheck(token)) {
+          currentState = nextToken;
+          _index++;
+        }
+        continue;
+      }
+      currentState = nextToken;
+      _index++;
     }
     for (Token token in _bracketsStack.reversed) {
       String value = token.value;
       _insertToken(
         TokenType.rightBracket,
-        _brackets.entries.where((e) => e.value == value).first.key,
+        _bracketsLtoR[value] ?? '',
       );
       _onAddException(token.position, 'Add new bracket');
     }
@@ -149,18 +158,32 @@ class SyntaxAnalyzer {
     }
   }
 
-  void _bracketCheck(Token token) {
+  bool _bracketCheck(Token token) {
     String value = token.value;
     if (value.isLeftBracket) {
       _bracketsStack.add(token);
-      return;
+      return true;
     }
-    if (_bracketsStack.isNotEmpty &&
-        _bracketsStack.last.value == _brackets[token.value]) {
-      _bracketsStack.removeLast();
-      return;
+    if (_bracketsStack.isNotEmpty) {
+      Token top = _bracketsStack.last;
+      if (top.value == _bracketsRtoL[token.value]) {
+        _bracketsStack.removeLast();
+      } else {
+        if (!_bracketsStack
+            .map((e) => e.value)
+            .contains(_bracketsRtoL[value])) {
+          _onAddException(token.position, 'Remove bracket');
+          _newTokens.removeAt(_index);
+          return false;
+        }
+        _insertToken(TokenType.rightBracket, _bracketsLtoR[top.value] ?? '');
+        _onAddException(top.position, 'Need add bracket');
+        _bracketsStack.removeLast();
+      }
+      return true;
     }
     _onAddException(token.position, 'Remove bracket');
     _newTokens.removeAt(_index);
+    return false;
   }
 }

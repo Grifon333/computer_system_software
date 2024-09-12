@@ -49,11 +49,12 @@ class LexicalAnalyzer {
       } else if (char.isPoint) {
         countPoints++;
         if (countPoints > 1) {
-          onAddException(_index, 'Second decimal point');
+          onAddException(_index, 'Extra decimal point');
         } else {
           number.add(data[_index]);
         }
       } else if (char.isUndefineChar) {
+        onAddException(_index, 'Undefine character: \'$char\'');
         continue;
       } else {
         break;
@@ -66,9 +67,11 @@ class LexicalAnalyzer {
     int start = _index;
     List<String> variable = [];
     while (_index < data.length) {
-      if (data[_index].isLetterOrDigit) {
+      String char = data[_index];
+      if (char.isLetterOrDigit) {
         variable.add(data[_index++]);
-      } else if (data[_index].isUndefineChar) {
+      } else if (char.isUndefineChar) {
+        onAddException(_index, 'Undefine character: \'$char\'');
         _index++;
       } else {
         break;
