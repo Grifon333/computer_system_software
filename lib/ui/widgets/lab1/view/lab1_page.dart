@@ -50,8 +50,11 @@ class _BodyWidget extends StatelessWidget {
             context.watch<Lab1Model>().results.length,
             (index) => ExpansionFormOfResult(index),
           ),
+          // const Graph(),
         ],
       ),
     );
   }
 }
+
+
