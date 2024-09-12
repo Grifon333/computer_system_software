@@ -47,6 +47,7 @@ sin             : sin(X1)
 
 1,2.4* n        : 1,24*n
 35&#k           : 35+k
+_k              : _k
 
 
 [(sin(x/))cos(^2)-tan(x[)) / (1x^(0..5))] * (exp(x)+sqrt(3.1,4)                                     : [(sin(x/X1))+cos(X2^2)-tan(x+[X3])/(1+x^(0.5))]*(exp(x)+sqrt(3.14))

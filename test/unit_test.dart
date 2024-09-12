@@ -25,7 +25,7 @@ void makeTest(int index, String actual, String matcher) {
   test('Analyzer $index', makeTestBody(actual, matcher));
 }
 
-final Automata automata = expressionAutomata;
+final Automata automata = Automata.expression();
 
 dynamic Function() makeTestBody(String actual, String matcher) {
   return () {

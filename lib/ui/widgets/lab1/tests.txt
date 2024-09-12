@@ -8,7 +8,7 @@ a+b*(c*cos(t-a*x)-d*sin(t+a*x)/(4.81*k-q*t))/(d*cos(t+a*y/f1(5.616*x-t))+c*sin(t
 
 -a-b*(k-t)-(f-g)*(f-5,9-q)-(f*g)/(d+q-w)
 
--a-b*(k-t)-(f-g)*(f-5,9-q)-(f*g)/(d+q-w)
+-a-b*(k-t)-(f-g)*(f-5,9-q)-(f*g)/(d+q-w
 
 a-2b*(k-t)-(f-g)*(f-5,9-q)-(f*g)/(d+q-w)
 
