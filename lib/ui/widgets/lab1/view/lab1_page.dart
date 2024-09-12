@@ -47,7 +47,7 @@ class _BodyWidget extends StatelessWidget {
             ),
           ),
           ...List.generate(
-            context.select((Lab1Model model) => model.results.length),
+            context.watch<Lab1Model>().results.length,
             (index) => ExpansionFormOfResult(index),
           ),
         ],

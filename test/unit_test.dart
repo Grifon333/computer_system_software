@@ -6,9 +6,10 @@ import 'package:computer_system_software/ui/widgets/lab1/models/syntax_analyzer.
 import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../assets/file_path.dart';
+
 void main() async {
-  List<String> lines = await File(
-          '/Users/danylokorol/Programming/Projects/Flutter/computer_system_software/test/tests')
+  List<String> lines = await File(filePathTests1)
       .readAsLines();
   int index = 1;
   for (String line in lines) {

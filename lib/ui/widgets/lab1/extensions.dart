@@ -9,7 +9,8 @@ extension CheckCharacters on String {
 
   bool get isPoint => ['.', ','].contains(this);
 
-  bool get isUndefineChar => !isLetterOrDigit && !'+-*/^!()., '.contains(this);
+  bool get isUndefineChar =>
+      !isLetterOrDigit && !isBracket && !'+-*/^!., '.contains(this);
 
   bool get isLeftBracket => '([{'.contains(this);
 

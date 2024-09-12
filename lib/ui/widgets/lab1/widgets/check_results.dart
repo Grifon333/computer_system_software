@@ -70,9 +70,9 @@ class CheckResult extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Exceptions:',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          Text(
+            result.isSuccess ? 'Expression:' : 'Exceptions:',
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
           RichText(
@@ -80,12 +80,12 @@ class CheckResult extends StatelessWidget {
               children: _colourExpression(),
             ),
           ),
-          const SizedBox(height: 4),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _convertExceptions(),
-          ),
           if (!result.isSuccess) ...[
+            const SizedBox(height: 4),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _convertExceptions(),
+            ),
             const SizedBox(height: 12),
             const Text(
               'Correct expression:',
