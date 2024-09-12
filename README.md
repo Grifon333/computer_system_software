@@ -1,16 +1,7 @@
 # computer_system_software
 
-A new Flutter project.
+The project was developed using the Flutter framework.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+**Lab1:**
+![Simulator Screenshot - iPhone 15 Pro Max - 2024-09-12 at 20 25 44](https://github.com/user-attachments/assets/305f52a2-0c9d-42d2-b887-6060c74884ed)
+![Simulator Screenshot - iPhone 15 Pro Max - 2024-09-12 at 19 39 16](https://github.com/user-attachments/assets/ee06bc1c-f03f-4ad0-9564-373c21d5f031)
