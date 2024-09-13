@@ -1,10 +1,11 @@
 import 'package:computer_system_software/ui/widgets/lab1/extensions.dart';
+import 'package:computer_system_software/ui/widgets/lab1/models/arithmetic_exception.dart';
 import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
 
 class LexicalAnalyzer {
   int _index = 0;
   final String data;
-  final void Function(int, String) onAddException;
+  final void Function(int, ArithmeticException) onAddException;
 
   LexicalAnalyzer({required this.data, required this.onAddException});
 
@@ -31,7 +32,10 @@ class LexicalAnalyzer {
         tokens.add(_makeToken(TokenType.rightBracket, char));
         _index++;
       } else {
-        onAddException(_index++, 'Undefine character: \'$char\'');
+        onAddException(
+          _index++,
+          UndefineCharException(char: char),
+        );
       }
     }
     tokens.add(_makeToken(TokenType.eof, ''));
@@ -49,12 +53,18 @@ class LexicalAnalyzer {
       } else if (char.isPoint) {
         countPoints++;
         if (countPoints > 1) {
-          onAddException(_index, 'Extra decimal point');
+          onAddException(
+            _index,
+            DecimalException(char: char),
+          );
         } else {
           number.add(data[_index]);
         }
       } else if (char.isUndefineChar) {
-        onAddException(_index, 'Undefine character: \'$char\'');
+        onAddException(
+          _index,
+          UndefineCharException(char: char),
+        );
         continue;
       } else {
         break;
@@ -71,7 +81,10 @@ class LexicalAnalyzer {
       if (char.isLetterOrDigit) {
         variable.add(data[_index++]);
       } else if (char.isUndefineChar) {
-        onAddException(_index, 'Undefine character: \'$char\'');
+        onAddException(
+          _index,
+          UndefineCharException(char: char),
+        );
         _index++;
       } else {
         break;

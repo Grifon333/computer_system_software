@@ -1,3 +1,4 @@
+import 'package:computer_system_software/ui/widgets/lab1/models/arithmetic_exception.dart';
 import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
 import 'package:computer_system_software/ui/widgets/lab1/models/lexical_analyzer.dart';
 import 'package:computer_system_software/ui/widgets/lab1/models/syntax_analyzer.dart';
@@ -7,26 +8,26 @@ import 'package:flutter/material.dart';
 class Lab1Model extends ChangeNotifier {
   String _data = '';
   List<Result> results = [];
-  String? currentState;
-  bool? isErrorState;
   bool isProgress = false;
   Map<String, String> renameVertices = {};
 
-  void checkExpressions() {
+  Future<void> checkExpressions() async {
     isProgress = true;
     notifyListeners();
     results.clear();
     for (String line in _data.split('\n')) {
       if (line.isEmpty) continue;
-      results.add(_checkExpression(line.trim()));
+      results.add(await _checkExpression(line.trim()));
+      notifyListeners();
     }
     isProgress = false;
     notifyListeners();
   }
 
-  Result _checkExpression(String line) {
-    Map<int, String> exceptions = {};
-    onAddException(int ind, String body) => exceptions.addAll({ind: body});
+  Future<Result> _checkExpression(String line) async {
+    Map<int, ArithmeticException> exceptions = {};
+    onAddException(int ind, ArithmeticException exception) =>
+        exceptions.addAll({ind: exception});
     final LexicalAnalyzer lexicalAnalyzer = LexicalAnalyzer(
       data: line,
       onAddException: onAddException,
@@ -41,10 +42,11 @@ class Lab1Model extends ChangeNotifier {
     exceptions = Map.fromEntries(
       exceptions.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
     );
+    await Future.delayed(const Duration(milliseconds: 500));
     return Result(
       isSuccess: exceptions.isEmpty,
       expression: line,
-      exceptions: exceptions,
+      exceptions: exceptions.map((key, value) => MapEntry(key, value.body)),
       correctExpression: newTokens,
     );
   }

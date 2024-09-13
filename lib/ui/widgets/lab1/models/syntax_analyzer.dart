@@ -1,3 +1,4 @@
+import 'package:computer_system_software/ui/widgets/lab1/models/arithmetic_exception.dart';
 import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
 import 'package:computer_system_software/ui/widgets/lab1/extensions.dart';
 import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
@@ -5,7 +6,7 @@ import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
 class SyntaxAnalyzer {
   final Automata _automata;
   final List<Token> _tokens;
-  final void Function(int, String) _onAddException;
+  final void Function(int, ArithmeticException) _onAddException;
   List<Token> _newTokens = [];
   final List<Token> _bracketsStack = [];
   int _index = 0;
@@ -24,7 +25,7 @@ class SyntaxAnalyzer {
   SyntaxAnalyzer({
     required Automata automata,
     required List<Token> tokens,
-    required void Function(int, String) onAddException,
+    required void Function(int, ArithmeticException) onAddException,
   })  : _onAddException = onAddException,
         _tokens = tokens,
         _automata = automata;
@@ -59,7 +60,10 @@ class SyntaxAnalyzer {
         TokenType.rightBracket,
         _bracketsLtoR[value] ?? '',
       );
-      _onAddException(token.position, 'Add new bracket');
+      _onAddException(
+        token.position,
+        BracketException(bracket: _bracketsLtoR[token.value]??'', rightBracket: true),
+      );
     }
     return _newTokens;
   }
@@ -74,13 +78,13 @@ class SyntaxAnalyzer {
       _insertToken(TokenType.number_variable, _makeVariable());
       _onAddException(
         token.position,
-        'Need to add a variable before the \'${token.value}\' sign',
+        VariableException(sign: token.value),
       );
     } else if (curState == _automata.startState && nextToken == rightBracket) {
       _newTokens.removeAt(_index);
       _onAddException(
         token.position,
-        'Remove the right bracket \'${token.value}\'',
+        BracketException(bracket: token.value, rightBracket: false),
       );
     } else if (curState == num_var ||
         (curState == factorial && nextToken != factorial) ||
@@ -88,17 +92,17 @@ class SyntaxAnalyzer {
       _insertToken(TokenType.plus_minus, '+');
       _onAddException(
         token.position,
-        'Need to add an operation before the \'${token.value}\' sign',
+        OperationException(sign: token.value),
       );
     } else if (curState == factorial && nextToken == factorial) {
       _newTokens.removeAt(_index);
       _onAddException(
         token.position,
-        'Remove the factorial sign',
+        FactorialException(),
       );
     } else if (curState == function) {
       String fun = _newTokens[_index - 1].value;
-      String expOpMsg = '';
+      String? operation;
       bool factExist = nextToken == factorial;
       List<(TokenType, String)> tokens = [];
       tokens.add((TokenType.leftBracket, '('));
@@ -113,12 +117,12 @@ class SyntaxAnalyzer {
       }
       if (nextToken == num_var || nextToken == function) {
         tokens.add((TokenType.plus_minus, '+'));
-        expOpMsg = ' and an operation before the \'${token.value}\' sign';
+        operation = token.value;
       }
       _insertAllTokens(tokens, factExist ? ++_index : _index);
       _onAddException(
         token.position,
-        'Need to add a variable for the \'$fun\' function$expOpMsg',
+        FunctionException(function: fun, sign: operation),
       );
     }
   }
@@ -172,17 +176,26 @@ class SyntaxAnalyzer {
         if (!_bracketsStack
             .map((e) => e.value)
             .contains(_bracketsRtoL[value])) {
-          _onAddException(token.position, 'Remove bracket');
+          _onAddException(
+            token.position,
+            BracketException(bracket: value, rightBracket: false),
+          );
           _newTokens.removeAt(_index);
           return false;
         }
         _insertToken(TokenType.rightBracket, _bracketsLtoR[top.value] ?? '');
-        _onAddException(top.position, 'Need add bracket');
+        _onAddException(
+          top.position,
+          BracketException(
+            bracket: _bracketsLtoR[value] ?? '',
+            rightBracket: true,
+          ),
+        );
         _bracketsStack.removeLast();
       }
       return true;
     }
-    _onAddException(token.position, 'Remove bracket');
+    _onAddException(token.position, BracketException(bracket: value));
     _newTokens.removeAt(_index);
     return false;
   }

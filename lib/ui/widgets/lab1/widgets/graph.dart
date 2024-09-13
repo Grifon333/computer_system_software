@@ -9,16 +9,13 @@ class Graph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size.width;
-    final model = context.read<Lab1Model>();
+    final model = context.watch<Lab1Model>();
     final renameVertices = model.renameVertices;
+    if (model.isProgress) return const SizedBox.shrink();
     return Column(
       children: [
         CustomPaint(
-          painter: MyPainter(
-            automata: model.renameAutomataVertices(),
-            currentState: context.read<Lab1Model>().currentState,
-            isErrorState: context.read<Lab1Model>().isErrorState,
-          ),
+          painter: MyPainter(automata: model.renameAutomataVertices()),
           size: Size(size, size),
         ),
         Row(
