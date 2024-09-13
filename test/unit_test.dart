@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/lexical_analyzer.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/syntax_analyzer.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
+import 'package:computer_system_software/library/lexical_analyzer.dart';
+import 'package:computer_system_software/library/syntax_analyzer.dart';
+import 'package:computer_system_software/library/token.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../assets/file_path.dart';

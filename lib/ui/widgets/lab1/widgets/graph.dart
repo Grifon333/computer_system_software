@@ -1,4 +1,4 @@
-import 'package:computer_system_software/ui/widgets/lab1/custom_painter.dart';
+import 'package:computer_system_software/library/custom_painter.dart';
 import 'package:computer_system_software/ui/widgets/lab1/lab1_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

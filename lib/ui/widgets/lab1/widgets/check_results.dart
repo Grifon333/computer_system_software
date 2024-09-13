@@ -1,5 +1,5 @@
 import 'package:computer_system_software/ui/widgets/lab1/lab1_model.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
+import 'package:computer_system_software/library/token.dart';
 import 'package:flutter/material.dart';
 
 class CheckResult extends StatelessWidget {

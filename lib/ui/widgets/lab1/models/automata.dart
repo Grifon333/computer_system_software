@@ -1,4 +1,4 @@
-import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
+import 'package:computer_system_software/library/token.dart';
 
 class Automata {
   final Set<String> states;

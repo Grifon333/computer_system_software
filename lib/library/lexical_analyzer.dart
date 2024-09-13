@@ -1,6 +1,6 @@
-import 'package:computer_system_software/ui/widgets/lab1/extensions.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/arithmetic_exception.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/token.dart';
+import 'package:computer_system_software/library/extensions.dart';
+import 'package:computer_system_software/library/arithmetic_exception.dart';
+import 'package:computer_system_software/library/token.dart';
 
 class LexicalAnalyzer {
   int _index = 0;
