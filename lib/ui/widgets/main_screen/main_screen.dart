@@ -17,7 +17,7 @@ class MainScreen extends StatelessWidget {
 class _BodyWidget extends StatelessWidget {
   const _BodyWidget();
 
-  final countLabs = 1;
+  final countLabs = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +25,12 @@ class _BodyWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: List.generate(
         5,
-            (index) {
+        (index) {
           index++;
           return _ButtonWidget(
             title: 'Lab $index',
             onPressed: index <= countLabs
-                ? () {
-              Navigator.of(context).pushNamed('/lab$index');
-            }
+                ? () => Navigator.of(context).pushNamed('/lab$index')
                 : null,
           );
         },
