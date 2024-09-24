@@ -6,7 +6,7 @@ import 'package:computer_system_software/library/syntax_analyzer.dart';
 import 'package:computer_system_software/library/token.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../assets/file_path.dart';
+import '../../assets/file_path.dart';
 
 void main() async {
   List<String> lines = await File(filePathTests1)

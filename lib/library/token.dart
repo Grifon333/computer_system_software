@@ -28,7 +28,8 @@ class Token extends Equatable {
 
   @override
   String toString() {
-    return 'Token(type: ${type.name}, value: $value, position: $position)';
+    // return 'Token(type: ${type.name}, value: $value, position: $position)';
+    return value;
   }
 
   @override

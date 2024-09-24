@@ -54,12 +54,14 @@ class SyntaxAnalyzer {
       currentState = nextToken;
       _index++;
     }
+    _index--;
     for (Token token in _bracketsStack.reversed) {
       String value = token.value;
       _insertToken(
         TokenType.rightBracket,
         _bracketsLtoR[value] ?? '',
       );
+      _index++;
       _onAddException(
         token.position,
         BracketException(bracket: _bracketsLtoR[token.value]??'', rightBracket: true),
