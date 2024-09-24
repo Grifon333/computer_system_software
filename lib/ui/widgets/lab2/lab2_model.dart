@@ -3,14 +3,22 @@ import 'package:computer_system_software/library/syntax_analyzer.dart';
 import 'package:computer_system_software/library/token.dart';
 import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
 import 'package:computer_system_software/ui/widgets/lab2/binary_tree_painter.dart';
+import 'package:computer_system_software/ui/widgets/lab2/models/node.dart';
 import 'package:flutter/material.dart';
 
 class Lab2Model extends ChangeNotifier {
   Node? tree;
+  String data = '';
+  AxisTree axisTree = AxisTree.vertical;
+
+  String get axis => axisTree.name;
 
   void buildTree() {
+    if (data.isEmpty) return;
+    tree = null;
+    notifyListeners();
     LexicalAnalyzer lexicalAnalyzer = LexicalAnalyzer(
-      data: '(aa+bbbb)*(c+d)-e',
+      data: data,
       onAddException: (_, __) {},
     );
     List<Token> tokens = lexicalAnalyzer.tokenize();
@@ -45,6 +53,8 @@ class Lab2Model extends ChangeNotifier {
           result.add(stack.removeLast());
         }
         stack.removeLast();
+      } else if (token.type == TokenType.function ||
+          token.type == TokenType.factorial) {
       } else if (token.type == TokenType.eof) {
         break;
       }
@@ -64,8 +74,15 @@ class Lab2Model extends ChangeNotifier {
       if (curr.rightChild == null) {
         curr.rightChild = Node(root: token);
         if (token.type != TokenType.number_variable) {
-          stack.add(curr);
+          if (curr.root.type != TokenType.factorial &&
+              curr.root.type != TokenType.function) {
+            stack.add(curr);
+          }
           curr = curr.rightChild!;
+        } else if (token.type == TokenType.number_variable &&
+            (curr.root.type == TokenType.function ||
+                curr.root.type == TokenType.factorial)) {
+          curr = stack.removeLast();
         }
       } else {
         curr.leftChild = Node(root: token);
@@ -76,7 +93,6 @@ class Lab2Model extends ChangeNotifier {
         }
       }
     }
-
     return node;
   }
 
@@ -109,45 +125,14 @@ class Lab2Model extends ChangeNotifier {
     }
   }
 
-// Node? _rightRotate(Node node) {
-//   Node? root = node.leftChild;
-//   if (root == null) return null;
-//   node.leftChild = node.leftChild?.rightChild;
-//   root.rightChild = node;
-//   return root;
-// }
-//
-// Node? _leftRotate(Node node) {
-//   Node? root = node.rightChild;
-//   if (root == null) return null;
-//   node.rightChild = node.rightChild?.leftChild;
-//   root.leftChild = node;
-//   return root;
-// }
-}
-
-class Node extends Tree<Token> {
-  Node({
-    required super.root,
-    super.leftChild,
-    super.rightChild,
-  });
-
-  @override
-  Node? get leftChild => super.leftChild as Node?;
-
-  @override
-  Node? get rightChild => super.rightChild as Node?;
-
-  @override
-  String getRoot() {
-    return root.value;
+  void onChangeData(String value) {
+    data = value;
   }
 
-  @override
-  String toString() {
-    String left = leftChild == null ? '' : ', left: $leftChild';
-    String right = rightChild == null ? '' : ', right: $rightChild';
-    return '{$root$left$right}';
+  void setAxis(String? value) {
+    if (value == null || value == axisTree.name) return;
+    axisTree = value == 'horizontal' ? AxisTree.horizontal : AxisTree.vertical;
+    notifyListeners();
+    buildTree();
   }
 }

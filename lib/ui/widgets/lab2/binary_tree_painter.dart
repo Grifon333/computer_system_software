@@ -16,11 +16,29 @@ abstract class Tree<T> {
     this.leftChild,
     this.rightChild,
   });
+
+  int get height => _height(this);
+
+  int _height(Tree<T>? tree) {
+    if (tree == null) return 0;
+    return max(_height(tree.leftChild), _height(tree.rightChild)) + 1;
+  }
+
+  int get countOfLeaves => _countOfLeaves(this);
+
+  int _countOfLeaves(Tree<T>? node) {
+    if (node == null) return 0;
+    if (node.leftChild == null && node.rightChild == null) return 1;
+    return _countOfLeaves(node.leftChild) + _countOfLeaves(node.rightChild);
+  }
 }
+
+enum AxisTree { vertical, horizontal }
 
 class BinaryTreePainter<T> extends CustomPainter {
   final Tree<T> tree;
   final double width;
+  final AxisTree axis;
   late final double height;
   late final double radius;
   late final double gap;
@@ -38,17 +56,22 @@ class BinaryTreePainter<T> extends CustomPainter {
   BinaryTreePainter({
     required this.tree,
     required this.width,
+    this.axis = AxisTree.vertical,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    int countNodesInWight =
+        axis == AxisTree.vertical ? tree.countOfLeaves : tree.height;
+    int treeHeight = tree.height;
     double x = width /
-        ((2 * _radiusRatio + _gapRatio) * _numberOfLeaves(tree) - _gapRatio);
+        ((2 * _radiusRatio + _gapRatio) * countNodesInWight - _gapRatio);
     radius = _radiusRatio * x;
     gap = _gapRatio * x;
-    height = (2 * radius + gap) * _heightTree(tree) - gap;
-    _drawTree(canvas, tree, _heightTree(tree) - 1);
-
+    height = (2 * radius + gap) * treeHeight - gap;
+    axis == AxisTree.vertical
+        ? _drawVerticalTree(canvas, tree, treeHeight - 1)
+        : _drawHorizontalTree(canvas, tree, treeHeight - 1);
     for (({Offset center, String name}) node in _nodes) {
       _drawNode(canvas, node.center, node.name);
     }
@@ -56,21 +79,53 @@ class BinaryTreePainter<T> extends CustomPainter {
 
   int leavesIndex = 0;
 
-  (double dx, double dy) _drawTree(Canvas canvas, Tree<T>? tree, int layer) {
-    if (tree == null) return (0, 0);
-    final left = _drawTree(canvas, tree.leftChild, layer - 1);
-    final right = _drawTree(canvas, tree.rightChild, layer - 1);
-    double dy = height - radius - (2 * radius + gap) * layer;
+  Offset _drawVerticalTree(Canvas canvas, Tree<T>? tree, int layer) {
+    if (tree == null) return const Offset(-1, -1);
+    final left = _drawVerticalTree(canvas, tree.leftChild, layer - 1);
+    final right = _drawVerticalTree(canvas, tree.rightChild, layer - 1);
     double dx = 0;
+    double dy = height - radius - (2 * radius + gap) * layer;
     if (tree.leftChild == null && tree.rightChild == null) {
       dx = radius + (2 * radius + gap) * leavesIndex++;
+    } else if (tree.leftChild == null || tree.rightChild == null) {
+      dx = max(left.dx, right.dx);
+      canvas.drawLine(
+        Offset(dx, max(left.dy, right.dy)),
+        Offset(dx, dy),
+        _paintEdge,
+      );
     } else {
-      dx = (left.$1 + right.$1) / 2;
-      canvas.drawLine(Offset(left.$1, left.$2), Offset(dx, dy), _paintEdge);
-      canvas.drawLine(Offset(right.$1, right.$2), Offset(dx, dy), _paintEdge);
+      dx = (left.dx + right.dx) / 2;
+      canvas.drawLine(Offset(left.dx, left.dy), Offset(dx, dy), _paintEdge);
+      canvas.drawLine(Offset(right.dx, right.dy), Offset(dx, dy), _paintEdge);
     }
     _nodes.add((center: Offset(dx, dy), name: tree.getRoot()));
-    return (dx, dy);
+    return Offset(dx, dy);
+  }
+
+  Offset _drawHorizontalTree(Canvas canvas, Tree<T>? tree, int layer) {
+    if (tree == null) return const Offset(-1, -1);
+    final left = _drawHorizontalTree(canvas, tree.leftChild, layer - 1);
+    final right = _drawHorizontalTree(canvas, tree.rightChild, layer - 1);
+    double dx = height - radius - (2 * radius + gap) * layer;
+    double dy = 0;
+    if (tree.leftChild == null && tree.rightChild == null) {
+      dy = radius + (2 * radius + gap) * leavesIndex++;
+    } else if (tree.leftChild == null || tree.rightChild == null) {
+      dy = max(left.dy, right.dy);
+      canvas.drawLine(
+        Offset(max(left.dx, right.dx), dy),
+        Offset(dx, dy),
+        _paintEdge,
+      );
+    } else {
+      dy = (left.dy + right.dy) / 2;
+      canvas.drawLine(Offset(left.dx, left.dy), Offset(dx, dy), _paintEdge);
+      canvas.drawLine(Offset(right.dx, right.dy), Offset(dx, dy), _paintEdge);
+    }
+    _nodes.add((center: Offset(dx, dy), name: tree.getRoot()));
+
+    return Offset(dx, dy);
   }
 
   void _drawNode(Canvas canvas, Offset center, String name) {
@@ -108,19 +163,8 @@ class BinaryTreePainter<T> extends CustomPainter {
     textPainter.paint(canvas, Offset(xCenter, yCenter));
   }
 
-  int _numberOfLeaves(Tree<T>? node) {
-    if (node == null) return 0;
-    if (node.leftChild == null && node.rightChild == null) return 1;
-    return _numberOfLeaves(node.leftChild) + _numberOfLeaves(node.rightChild);
-  }
-
-  int _heightTree(Tree<T>? node) {
-    if (node == null) return 0;
-    return max(_heightTree(node.leftChild), _heightTree(node.rightChild)) + 1;
-  }
-
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+    return true;
   }
 }
