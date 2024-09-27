@@ -22,7 +22,7 @@ class Token extends Equatable {
   const Token({
     required this.type,
     required this.value,
-    required this.position,
+    this.position = 0,
     this.visibleType = TokenVisibleType.init,
   });
 

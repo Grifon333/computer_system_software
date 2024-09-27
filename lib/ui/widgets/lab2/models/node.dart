@@ -25,10 +25,11 @@ class Node extends Tree<Token> with EquatableMixin {
     // String left = leftChild == null ? '' : ', left: $leftChild';
     // String right = rightChild == null ? '' : ', right: $rightChild';
     // return '{$root$left$right}';
-    return '\n${toTreeView()}';
+    return toTreeView();
   }
 
   final String _gap = '    ';
+
   String toTreeView([String tab = '']) {
     List<String> list = [];
     list.add(getRoot());
