@@ -11,11 +11,16 @@ import 'package:flutter/material.dart';
 
 class Lab2Model extends ChangeNotifier {
   Node? tree;
+  Node? optimizedTree;
   String _data = '';
   String _previousData = '';
+  String startExpression = '';
+  String restoreExpression = '';
   AxisTree axisTree = AxisTree.vertical;
 
   String get axis => axisTree.name;
+
+  String get expression => _treeToExpression(optimizedTree);
 
   void buildTree() {
     if (_data.isEmpty || _data == _previousData) return;
@@ -32,6 +37,7 @@ class Lab2Model extends ChangeNotifier {
       onAddException: (_, __) {},
     );
     tokens = syntaxAnalyzer.analyze();
+    startExpression = tokens.join();
     debugPrint('Start expression: ${tokens.map((e) => e.value).join(' ')}');
     List<Token> list = _expressionToPost(tokens);
     debugPrint('Reverse Polish entry: ${list.join()}');
@@ -41,21 +47,23 @@ class Lab2Model extends ChangeNotifier {
     debugPrint('------------------------------------------------------\n');
     _optimizations();
     debugPrint('----------------------Result Tree---------------------');
-    debugPrint(tree.toString());
+    debugPrint(optimizedTree.toString());
     debugPrint('------------------------------------------------------\n');
-    notifyListeners();
     _previousData = _data;
     debugPrint('Restored expression: $expression');
     debugPrint('\n');
+    restoreExpression = expression;
+    notifyListeners();
   }
 
   void _optimizations() {
-    Node? oldTree = tree;
+    optimizedTree = tree?.copyWith();
+    Node? oldTree = optimizedTree;
     while (true) {
-      tree = _expressionAbbreviation(tree);
-      tree = _optimizationTree(tree);
-      if (oldTree == tree) return;
-      oldTree = tree;
+      optimizedTree = _expressionAbbreviation(optimizedTree);
+      optimizedTree = _optimizationTree(optimizedTree);
+      if (oldTree == optimizedTree) return;
+      oldTree = optimizedTree;
     }
   }
 
@@ -163,42 +171,117 @@ class Lab2Model extends ChangeNotifier {
     return node;
   }
 
-  bool _isLeftRotate(Node node) {
+  bool _isRightRotate(Node node) {
     int leftHeight = node.leftChild?.height ?? 0;
     int rightHeight = node.rightChild?.height ?? 0;
     return leftHeight - rightHeight > 1 &&
         node.root.type == node.leftChild?.root.type;
   }
 
-  bool _isRightRotate(Node node) {
+  bool _isLeftRotate(Node node) {
     int leftHeight = node.leftChild?.height ?? 0;
     int rightHeight = node.rightChild?.height ?? 0;
     return rightHeight - leftHeight > 1 &&
         node.root.type == node.rightChild?.root.type;
   }
 
-  Node? _leftRotate(Node node) {
+  Node? _rightRotate(Node node) {
     int leftLeftHeight = node.leftChild?.leftChild?.height ?? 0;
     int leftRightHeight = node.leftChild?.rightChild?.height ?? 0;
     if (leftRightHeight > leftLeftHeight &&
         node.root.type == node.leftChild?.rightChild?.root.type) {
+      Node? left = node.leftChild;
+      Node? leftRight = node.leftChild?.rightChild;
+      if (left?.root.value == '/' && leftRight?.root.value == '/') {
+        node.leftChild?.rightChild = _swapOperation(leftRight!);
+      } else if (node.root.value == '/' &&
+          left?.root.value == '/' &&
+          leftRight?.root.value == '*') {
+        node = _swapOperation(node);
+        node.leftChild?.rightChild = _swapOperation(leftRight!);
+      } else if (node.root.value == '/' &&
+          left?.root.value == '*' &&
+          leftRight?.root.value == '/') {
+        node = _swapOperation(node);
+      } else if (node.root.value == '*' &&
+          left?.root.value == '/' &&
+          leftRight?.root.value == '*') {
+        node = _swapOperation(node);
+        final t = node.rightChild;
+        node.rightChild = node.leftChild?.rightChild?.rightChild;
+        node.leftChild?.rightChild?.rightChild = t;
+      } else if (node.root.value == '*' &&
+          left?.root.value == '*' &&
+          leftRight?.root.value == '/') {
+        node = _swapOperation(node);
+        node.leftChild?.rightChild = _swapOperation(leftRight!);
+        final t = node.rightChild;
+        node.rightChild = node.leftChild?.rightChild?.rightChild;
+        node.leftChild?.rightChild?.rightChild = t;
+      }
       return node.bigRightRotate();
     } else if (leftRightHeight < leftLeftHeight) {
+      if (node.root.value == '/' && node.leftChild?.root.value == '/') {
+        node = _swapOperation(node);
+      } else if (node.root.value == '*' && node.leftChild?.root.value == '/') {
+        node = _swapOperation(node);
+        node.leftChild = _swapOperation(node.leftChild!);
+        final t = node.rightChild;
+        node.rightChild = node.leftChild?.rightChild;
+        node.leftChild?.rightChild = t;
+      }
       return node.smallRightRotate();
     }
     return node;
   }
 
-  Node? _rightRotate(Node node) {
+  Node? _leftRotate(Node node) {
     int rightLeftHeight = node.rightChild?.leftChild?.height ?? 0;
     int rightRightHeight = node.rightChild?.rightChild?.height ?? 0;
     if (rightLeftHeight > rightRightHeight &&
         node.root.type == node.rightChild?.leftChild?.root.type) {
+      Node? right = node.rightChild;
+      Node? rightLeft = node.rightChild?.leftChild;
+      if (node.root.value == '/' && rightLeft?.root.value == '/') {
+        node.rightChild = _swapOperation(right!);
+        node.rightChild?.leftChild = _swapOperation(rightLeft!);
+      } else if (node.root.value == '/' &&
+          right?.root.value == '/' &&
+          rightLeft?.root.value == '*') {
+        final t = node.rightChild?.rightChild;
+        node.rightChild?.rightChild = node.rightChild?.leftChild?.rightChild;
+        node.rightChild?.leftChild?.rightChild = t;
+      } else if (node.root.value == '/' &&
+          right?.root.value == '*' &&
+          rightLeft?.root.value == '*') {
+        node.rightChild?.leftChild = _swapOperation(rightLeft!);
+      } else if (node.root.value == '*' &&
+          right?.root.value == '/' &&
+          rightLeft?.root.value == '/') {
+        node.rightChild = _swapOperation(right!);
+      } else if (node.root.value == '*' &&
+          right?.root.value == '*' &&
+          rightLeft?.root.value == '/') {
+        node.rightChild = _swapOperation(right!);
+        node.rightChild?.leftChild = _swapOperation(rightLeft!);
+        final t = node.rightChild?.rightChild;
+        node.rightChild?.rightChild = node.rightChild?.leftChild?.rightChild;
+        node.rightChild?.leftChild?.rightChild = t;
+      }
       return node.bigLeftRotate();
     } else if (rightLeftHeight < rightRightHeight) {
+      if (node.root.value == '/') {
+        node.rightChild = _swapOperation(node.rightChild!);
+      }
       return node.smallLeftRotate();
     }
     return node;
+  }
+
+  Node _swapOperation(Node node) {
+    String operation = node.root.value;
+    operation = operation == '/' ? '*' : '/';
+    return node.copyWith(root: node.root.copyWith(value: operation));
   }
 
   Node? _expressionAbbreviation(Node? node) {
@@ -210,6 +293,11 @@ class Lab2Model extends ChangeNotifier {
         (node.leftChild?.root.value == '0' || node.leftChild == null)) {
       return node.rightChild;
     } else if (node.root.value == '-' && node.leftChild == null) {
+      if (_isNumber(node.rightChild?.root.value)) {
+        double x = double.parse(node.rightChild!.root.value);
+        x = -x;
+        return Node(root: Token(type: TokenType.number_variable, value: '$x'));
+      }
       // node.leftChild = Node(
       //   root: const Token(type: TokenType.number_variable, value: '0'),
       // );
@@ -308,8 +396,6 @@ class Lab2Model extends ChangeNotifier {
     }
     return result;
   }
-
-  String get expression => _treeToExpression(tree);
 
   String _treeToExpression(Node? node) {
     if (node == null) return '';

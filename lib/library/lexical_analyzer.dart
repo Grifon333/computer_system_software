@@ -58,7 +58,7 @@ class LexicalAnalyzer {
             DecimalException(char: char),
           );
         } else {
-          number.add(data[_index]);
+          number.add('.');
         }
       } else if (char.isUndefineChar) {
         onAddException(

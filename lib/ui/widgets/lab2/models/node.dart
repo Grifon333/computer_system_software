@@ -77,8 +77,8 @@ class Node extends Tree<Token> with EquatableMixin {
     Node? root = node.rightChild?.leftChild;
     Node left = node;
     Node? right = node.rightChild;
-    node.rightChild = root?.leftChild;
     node.rightChild?.leftChild = root?.rightChild;
+    node.rightChild = root?.leftChild;
     root?.leftChild = left;
     root?.rightChild = right;
     return root;
@@ -86,4 +86,16 @@ class Node extends Tree<Token> with EquatableMixin {
 
   @override
   List<Object?> get props => [root, leftChild, rightChild];
+
+  Node copyWith({
+    Token? root,
+    Node? leftChild,
+    Node? rightChild,
+  }) {
+    return Node(
+      root: root ?? this.root,
+      leftChild: leftChild ?? this.leftChild,
+      rightChild: rightChild ?? this.rightChild,
+    );
+  }
 }
