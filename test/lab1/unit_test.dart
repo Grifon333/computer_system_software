@@ -9,8 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../assets/file_path.dart';
 
 void main() async {
-  List<String> lines = await File(filePathTests1)
-      .readAsLines();
+  List<String> lines = await File(filePathTests1).readAsLines();
   int index = 1;
   for (String line in lines) {
     if (line.isEmpty) continue;
@@ -42,11 +41,4 @@ dynamic Function() makeTestBody(String actual, String matcher) {
     List<Token> newTokens = syntaxAnalyzer.analyze();
     expect(newTokens.map((e) => e.value).join(), matcher);
   };
-}
-
-class TestBody {
-  final String actual;
-  final String matcher;
-
-  TestBody(this.actual, this.matcher);
 }
