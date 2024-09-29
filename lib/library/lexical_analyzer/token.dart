@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+// TODO
 enum TokenType {
   number_variable,
   plus_minus,
@@ -47,12 +48,3 @@ class Token extends Equatable {
     );
   }
 }
-
-Map<String, TokenType> charMap = {
-  '+': TokenType.plus_minus,
-  '-': TokenType.plus_minus,
-  '*': TokenType.multiple_divide_power,
-  '/': TokenType.multiple_divide_power,
-  '^': TokenType.multiple_divide_power,
-  '!': TokenType.factorial,
-};

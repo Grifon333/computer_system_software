@@ -1,4 +1,4 @@
-import 'package:computer_system_software/library/token.dart';
+import 'package:computer_system_software/library/lexical_analyzer/token.dart';
 
 class Automata {
   final Set<String> states;
@@ -32,6 +32,7 @@ class Automata {
   }
 }
 
+// TODO: make private
 final String num_var = TokenType.number_variable.name;
 final String plus_minus = TokenType.plus_minus.name;
 final String mult_div_pow = TokenType.multiple_divide_power.name;
@@ -40,4 +41,3 @@ final String leftBracket = TokenType.leftBracket.name;
 final String rightBracket = TokenType.rightBracket.name;
 final String function = TokenType.function.name;
 final String eof = TokenType.eof.name;
-

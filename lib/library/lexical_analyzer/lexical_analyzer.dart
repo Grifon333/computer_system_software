@@ -1,15 +1,29 @@
-import 'package:computer_system_software/library/extensions.dart';
+import 'package:computer_system_software/library/stringExtensions.dart';
 import 'package:computer_system_software/library/arithmetic_exception.dart';
-import 'package:computer_system_software/library/token.dart';
+import 'package:computer_system_software/library/lexical_analyzer/token.dart';
+
+export 'token.dart';
 
 class LexicalAnalyzer {
   int _index = 0;
-  final String data;
-  final void Function(int, ArithmeticException) onAddException;
+  late String _data;
+  late void Function(int, ArithmeticException) _onAddException;
 
-  LexicalAnalyzer({required this.data, required this.onAddException});
+  Map<String, TokenType> operationsType = {
+    '+': TokenType.plus_minus,
+    '-': TokenType.plus_minus,
+    '*': TokenType.multiple_divide_power,
+    '/': TokenType.multiple_divide_power,
+    '^': TokenType.multiple_divide_power,
+    '!': TokenType.factorial,
+  };
 
-  List<Token> tokenize() {
+  List<Token> tokenize(
+    String data, [
+    void Function(int, ArithmeticException)? onAddException,
+  ]) {
+    _data = data;
+    _onAddException = onAddException ?? (_, __) {};
     _index = 0;
     List<Token> tokens = [];
     while (_index < data.length) {
@@ -22,8 +36,8 @@ class LexicalAnalyzer {
       } else if (char.isLetter) {
         Token token = _readVariable();
         tokens.add(token);
-      } else if (charMap.containsKey(char)) {
-        tokens.add(_makeToken(charMap[char]!, char));
+      } else if (operationsType.containsKey(char)) {
+        tokens.add(_makeToken(operationsType[char]!, char));
         _index++;
       } else if (char.isLeftBracket) {
         tokens.add(_makeToken(TokenType.leftBracket, char));
@@ -32,7 +46,7 @@ class LexicalAnalyzer {
         tokens.add(_makeToken(TokenType.rightBracket, char));
         _index++;
       } else {
-        onAddException(
+        _onAddException(
           _index++,
           UndefineCharException(char: char),
         );
@@ -46,14 +60,14 @@ class LexicalAnalyzer {
     int start = _index;
     int countPoints = 0;
     List<String> number = [];
-    for (; _index < data.length; _index++) {
-      String char = data[_index];
+    for (; _index < _data.length; _index++) {
+      String char = _data[_index];
       if (char.isDigit) {
-        number.add(data[_index]);
+        number.add(_data[_index]);
       } else if (char.isPoint) {
         countPoints++;
         if (countPoints > 1) {
-          onAddException(
+          _onAddException(
             _index,
             DecimalException(char: char),
           );
@@ -61,7 +75,7 @@ class LexicalAnalyzer {
           number.add('.');
         }
       } else if (char.isUndefineChar) {
-        onAddException(
+        _onAddException(
           _index,
           UndefineCharException(char: char),
         );
@@ -76,12 +90,12 @@ class LexicalAnalyzer {
   Token _readVariable() {
     int start = _index;
     List<String> variable = [];
-    while (_index < data.length) {
-      String char = data[_index];
+    while (_index < _data.length) {
+      String char = _data[_index];
       if (char.isLetterOrDigit) {
-        variable.add(data[_index++]);
+        variable.add(_data[_index++]);
       } else if (char.isUndefineChar) {
-        onAddException(
+        _onAddException(
           _index,
           UndefineCharException(char: char),
         );
@@ -92,7 +106,7 @@ class LexicalAnalyzer {
     }
     final element = variable.join();
     TokenType type = TokenType.number_variable;
-    if (element.isFunction || (_index < data.length && data[_index] == '(')) {
+    if (element.isFunction || (_index < _data.length && _data[_index] == '(')) {
       type = TokenType.function;
     }
     return _makeToken(type, element, start);

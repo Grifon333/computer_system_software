@@ -1,9 +1,9 @@
 import 'dart:math';
-import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
+import 'package:computer_system_software/library/syntax_analyzer/automata.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
-class MyPainter extends CustomPainter {
+class AutomataPainter extends CustomPainter {
   final Automata _automata;
   final String? _currentState;
   final bool? _isErrorState;
@@ -17,7 +17,7 @@ class MyPainter extends CustomPainter {
   final radius = 30.0;
   final Map<String, Offset> vertexCenters = {};
 
-  MyPainter({
+  AutomataPainter({
     required Automata automata,
     String? currentState,
     bool? isErrorState,

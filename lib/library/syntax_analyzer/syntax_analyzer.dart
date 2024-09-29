@@ -1,12 +1,12 @@
 import 'package:computer_system_software/library/arithmetic_exception.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
-import 'package:computer_system_software/library/extensions.dart';
-import 'package:computer_system_software/library/token.dart';
+import 'package:computer_system_software/library/syntax_analyzer/automata.dart';
+import 'package:computer_system_software/library/stringExtensions.dart';
+import 'package:computer_system_software/library/lexical_analyzer/token.dart';
 
 class SyntaxAnalyzer {
-  final Automata _automata;
-  final List<Token> _tokens;
-  final void Function(int, ArithmeticException) _onAddException;
+  late Automata _automata;
+  late List<Token> _tokens;
+  late void Function(int, ArithmeticException) _onAddException;
   List<Token> _newTokens = [];
   final List<Token> _bracketsStack = [];
   int _index = 0;
@@ -22,17 +22,17 @@ class SyntaxAnalyzer {
     '{': '}',
   };
 
-  SyntaxAnalyzer({
-    required Automata automata,
-    required List<Token> tokens,
-    required void Function(int, ArithmeticException) onAddException,
-  })  : _onAddException = onAddException,
-        _tokens = tokens,
-        _automata = automata;
-
-  List<Token> analyze() {
+  List<Token> analyze(
+    List<Token> tokens,
+    Automata automata, [
+    void Function(int, ArithmeticException)? onAddException,
+  ]) {
+    _automata = automata;
+    _tokens = tokens;
+    _onAddException = onAddException ?? (_, __) {};
     _newTokens = [..._tokens];
     _index = 0;
+    _lastVariableIndex = 1;
     String currentState = _automata.startState;
     final rules = _automata.rules;
     while (_index < _newTokens.length) {
@@ -64,9 +64,11 @@ class SyntaxAnalyzer {
       _index++;
       _onAddException(
         token.position,
-        BracketException(bracket: _bracketsLtoR[token.value]??'', rightBracket: true),
+        BracketException(
+            bracket: _bracketsLtoR[token.value] ?? '', rightBracket: true),
       );
     }
+    _bracketsStack.clear();
     return _newTokens;
   }
 
