@@ -38,6 +38,30 @@ a*((b/c)/d)                             : a*b/c*d
 a*(b*c/d)                               : a*b*c/d
 a*((b/c)*d)                             : a*b*d/c
 
+((a+b)-c)-d                             : a+b-(c+d)
+(a+b)+c-d                               : a+b+c-d
+(a+b)-c+d                               : a+b+d-c
+a-(b-(c+d))                             : a-b+c+d
+a-(b+(c+d))                             : a-b-(c+d)
+a+b-(c+d)                               : a+b-(c+d)
+
+(a-(b-c))-d                             : a-b+c-d
+a-(b+c)-d                               : a-b-(c+d)
+a+(b-c)-d                               : a+b-(c+d)
+a+b+c-d                                 : a+b+c-d
+a-(b-c)+d                               : a-b+c+d
+a-(b+c)+d                               : a-b+d-c
+a+(b-c)+d                               : a+b+d-c
+
+a-((b-c)-d)                             : a-b+c+d
+a-(b+c-d)                               : a-b+d-c
+a-((b-c)+d)                             : a-b+c-d
+a-(b+c+d)                               : a-b-(c+d)
+a+((b-c)-d)                             : a+b-(c+d)
+a+(b+c-d)                               : a+b+c-d
+a+((b-c)+d)                             : a+b+d-c
+
+
 
 cos(g)*a+5+c*d+e-d*f3/avc_1             : cos(g)*a+5+c*d+e-d*f3/avc_1
 (a+b)+func((a*baa+1bj_ko*(j-c))         : a+b+func(a*baa+1+bj_ko*(j-c))

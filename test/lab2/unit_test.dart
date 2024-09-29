@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:computer_system_software/library/token.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
-import 'package:computer_system_software/ui/widgets/lab2/lab2.dart';
-import 'package:computer_system_software/ui/widgets/lab2/models/node.dart';
+import 'package:computer_system_software/domain/entities/tree.dart';
+import 'package:computer_system_software/domain/repositories/expression_analyzer_repository.dart';
+import 'package:computer_system_software/domain/repositories/expression_tree_repository.dart';
+import 'package:computer_system_software/library/lexical_analyzer/token.dart';
+import 'package:computer_system_software/library/syntax_analyzer/automata.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../assets/file_path.dart';
@@ -15,125 +16,125 @@ void main() async {
       test(
         'test 1: right rotation',
         () {
-          Node? node = Node(
+          Tree? tree = Tree(
             root: makeTokenOperation(),
-            leftChild: Node(
+            leftChild: Tree(
               root: makeTokenOperation(),
-              leftChild: Node(
+              leftChild: Tree(
                 root: makeTokenOperation(),
-                leftChild: Node(root: makeTokenVariable('a')),
-                rightChild: Node(root: makeTokenVariable('b')),
+                leftChild: Tree(root: makeTokenVariable('a')),
+                rightChild: Tree(root: makeTokenVariable('b')),
               ),
-              rightChild: Node(root: makeTokenVariable('c')),
+              rightChild: Tree(root: makeTokenVariable('c')),
             ),
-            rightChild: Node(root: makeTokenVariable('d')),
+            rightChild: Tree(root: makeTokenVariable('d')),
           );
-          node = node.smallRightRotate();
-          Node matcher = Node(
+          tree = tree.smallRightRotate();
+          Tree matcher = Tree(
             root: makeTokenOperation(),
-            leftChild: Node(
+            leftChild: Tree(
               root: makeTokenOperation(),
-              leftChild: Node(root: makeTokenVariable('a')),
-              rightChild: Node(root: makeTokenVariable('b')),
+              leftChild: Tree(root: makeTokenVariable('a')),
+              rightChild: Tree(root: makeTokenVariable('b')),
             ),
-            rightChild: Node(
+            rightChild: Tree(
               root: makeTokenOperation(),
-              leftChild: Node(root: makeTokenVariable('c')),
-              rightChild: Node(root: makeTokenVariable('d')),
+              leftChild: Tree(root: makeTokenVariable('c')),
+              rightChild: Tree(root: makeTokenVariable('d')),
             ),
           );
-          expect(node, matcher);
+          expect(tree, matcher);
         },
       );
 
       test(
         'test 2: right rotation',
         () {
-          Node? node = Node(
+          Tree? tree = Tree(
               root: makeTokenOperation(),
-              leftChild: Node(
+              leftChild: Tree(
                 root: makeTokenOperation(),
-                leftChild: Node(
+                leftChild: Tree(
                   root: makeTokenOperation(),
-                  leftChild: Node(root: makeTokenVariable('a')),
-                  rightChild: Node(root: makeTokenVariable('b')),
+                  leftChild: Tree(root: makeTokenVariable('a')),
+                  rightChild: Tree(root: makeTokenVariable('b')),
                 ),
-                rightChild: Node(
+                rightChild: Tree(
                   root: makeTokenOperation(),
-                  leftChild: Node(root: makeTokenVariable('c')),
-                  rightChild: Node(root: makeTokenVariable('d')),
+                  leftChild: Tree(root: makeTokenVariable('c')),
+                  rightChild: Tree(root: makeTokenVariable('d')),
                 ),
               ),
-              rightChild: Node(root: makeTokenVariable('e')));
-          node = node.smallRightRotate();
-          Node matcher = Node(
+              rightChild: Tree(root: makeTokenVariable('e')));
+          tree = tree.smallRightRotate();
+          Tree matcher = Tree(
             root: makeTokenOperation(),
-            leftChild: Node(
+            leftChild: Tree(
               root: makeTokenOperation(),
-              leftChild: Node(root: makeTokenVariable('a')),
-              rightChild: Node(root: makeTokenVariable('b')),
+              leftChild: Tree(root: makeTokenVariable('a')),
+              rightChild: Tree(root: makeTokenVariable('b')),
             ),
-            rightChild: Node(
+            rightChild: Tree(
               root: makeTokenOperation(),
-              leftChild: Node(
+              leftChild: Tree(
                 root: makeTokenOperation(),
-                leftChild: Node(root: makeTokenVariable('c')),
-                rightChild: Node(root: makeTokenVariable('d')),
+                leftChild: Tree(root: makeTokenVariable('c')),
+                rightChild: Tree(root: makeTokenVariable('d')),
               ),
-              rightChild: Node(root: makeTokenVariable('e')),
+              rightChild: Tree(root: makeTokenVariable('e')),
             ),
           );
-          expect(node, matcher);
+          expect(tree, matcher);
         },
       );
 
       test(
         'test 3: big right rotation',
         () {
-          Node? node = Node(
+          Tree? tree = Tree(
             root: makeTokenOperation(),
-            leftChild: Node(
+            leftChild: Tree(
               root: makeTokenOperation(),
-              leftChild: Node(
+              leftChild: Tree(
                 root: makeTokenOperation(),
-                leftChild: Node(root: makeTokenVariable('a')),
-                rightChild: Node(root: makeTokenVariable('b')),
+                leftChild: Tree(root: makeTokenVariable('a')),
+                rightChild: Tree(root: makeTokenVariable('b')),
               ),
-              rightChild: Node(
+              rightChild: Tree(
                 root: makeTokenOperation(),
-                leftChild: Node(
+                leftChild: Tree(
                   root: makeTokenOperation(),
-                  leftChild: Node(root: makeTokenVariable('c')),
-                  rightChild: Node(root: makeTokenVariable('d')),
+                  leftChild: Tree(root: makeTokenVariable('c')),
+                  rightChild: Tree(root: makeTokenVariable('d')),
                 ),
-                rightChild: Node(root: makeTokenVariable('e')),
+                rightChild: Tree(root: makeTokenVariable('e')),
               ),
             ),
-            rightChild: Node(root: makeTokenVariable('f')),
+            rightChild: Tree(root: makeTokenVariable('f')),
           );
-          node = node.bigRightRotate();
-          Node matcher = Node(
+          tree = tree.bigRightRotate();
+          Tree matcher = Tree(
             root: makeTokenOperation(),
-            leftChild: Node(
+            leftChild: Tree(
               root: makeTokenOperation(),
-              leftChild: Node(
+              leftChild: Tree(
                 root: makeTokenOperation(),
-                leftChild: Node(root: makeTokenVariable('a')),
-                rightChild: Node(root: makeTokenVariable('b')),
+                leftChild: Tree(root: makeTokenVariable('a')),
+                rightChild: Tree(root: makeTokenVariable('b')),
               ),
-              rightChild: Node(
+              rightChild: Tree(
                 root: makeTokenOperation(),
-                leftChild: Node(root: makeTokenVariable('c')),
-                rightChild: Node(root: makeTokenVariable('d')),
+                leftChild: Tree(root: makeTokenVariable('c')),
+                rightChild: Tree(root: makeTokenVariable('d')),
               ),
             ),
-            rightChild: Node(
+            rightChild: Tree(
               root: makeTokenOperation(),
-              leftChild: Node(root: makeTokenVariable('e')),
-              rightChild: Node(root: makeTokenVariable('f')),
+              leftChild: Tree(root: makeTokenVariable('e')),
+              rightChild: Tree(root: makeTokenVariable('f')),
             ),
           );
-          expect(node, matcher);
+          expect(tree, matcher);
         },
       );
     },
@@ -163,14 +164,16 @@ void makeTest(int index, String actual, String matcher) {
 }
 
 final Automata automata = Automata.expression();
+final ExpressionAnalyzerRepository expressionAnalyzerRepository =
+    ExpressionAnalyzerRepository();
+final ExpressionTreeRepository expressionTreeRepository =
+    ExpressionTreeRepository();
 
 dynamic Function() makeTestBody(String actual, String matcher) {
   return () {
-    final model = Lab2Model();
-    model.onChangeData(actual);
-    model.buildTree();
-    String restoredExpression = model.expression;
-    expect(restoredExpression, matcher);
-    // expect(tokens.map((e) => e.value).join(), matcher);
+    List<Token> tokens = expressionAnalyzerRepository.analyze(actual);
+    Tree? tree = expressionTreeRepository.build(tokens);
+    String expression = expressionTreeRepository.treeToExpression(tree);
+    expect(expression, matcher);
   };
 }
