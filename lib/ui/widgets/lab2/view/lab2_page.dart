@@ -1,4 +1,4 @@
-import 'package:computer_system_software/ui/widgets/lab2/binary_tree_painter.dart';
+import 'package:computer_system_software/library/painters/binary_tree_painter/binary_tree_painter.dart';
 import 'package:computer_system_software/ui/widgets/lab2/lab2_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -116,7 +116,7 @@ class _BinaryTree extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tree = context.select((Lab2Model model) => model.optimizedTree);
+    final tree = context.select((Lab2Model model) => model.tree);
     if (tree == null) return const SizedBox.shrink();
     final width = MediaQuery.of(context).size.width - 34;
 
@@ -149,7 +149,7 @@ class _Expressions extends StatelessWidget {
     final startExpression =
         context.select((Lab2Model model) => model.startExpression);
     final restoreExpression =
-        context.select((Lab2Model model) => model.restoreExpression);
+        context.select((Lab2Model model) => model.expression);
     if (startExpression == '' || restoreExpression == '') {
       return const SizedBox.shrink();
     }

@@ -24,7 +24,7 @@ class _BodyWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: List.generate(
-        5,
+        6,
         (index) {
           index++;
           return _ButtonWidget(

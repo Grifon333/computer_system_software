@@ -1,11 +1,13 @@
+import 'package:computer_system_software/domain/repositories/expression_analyzer_repository.dart';
 import 'package:computer_system_software/library/arithmetic_exception.dart';
-import 'package:computer_system_software/ui/widgets/lab1/models/automata.dart';
-import 'package:computer_system_software/library/lexical_analyzer.dart';
-import 'package:computer_system_software/library/syntax_analyzer.dart';
-import 'package:computer_system_software/library/token.dart';
+import 'package:computer_system_software/library/lexical_analyzer/lexical_analyzer.dart';
+import 'package:computer_system_software/library/lexical_analyzer/token.dart';
+import 'package:computer_system_software/library/syntax_analyzer/automata.dart';
 import 'package:flutter/material.dart';
 
 class Lab1Model extends ChangeNotifier {
+  final ExpressionAnalyzerRepository _expressionAnalyzerRepository =
+      ExpressionAnalyzerRepository();
   String _data = '';
   List<Result> results = [];
   bool isProgress = false;
@@ -28,17 +30,7 @@ class Lab1Model extends ChangeNotifier {
     Map<int, ArithmeticException> exceptions = {};
     onAddException(int ind, ArithmeticException exception) =>
         exceptions.addAll({ind: exception});
-    final LexicalAnalyzer lexicalAnalyzer = LexicalAnalyzer(
-      data: line,
-      onAddException: onAddException,
-    );
-    List<Token> tokens = lexicalAnalyzer.tokenize();
-    final SyntaxAnalyzer syntaxAnalyzer = SyntaxAnalyzer(
-      automata: Automata.expression(),
-      tokens: tokens,
-      onAddException: onAddException,
-    );
-    List<Token> newTokens = syntaxAnalyzer.analyze();
+    final tokens = _expressionAnalyzerRepository.analyze(line, onAddException);
     exceptions = Map.fromEntries(
       exceptions.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
     );
@@ -47,13 +39,11 @@ class Lab1Model extends ChangeNotifier {
       isSuccess: exceptions.isEmpty,
       expression: line,
       exceptions: exceptions.map((key, value) => MapEntry(key, value.body)),
-      correctExpression: newTokens,
+      correctExpression: tokens,
     );
   }
 
-  void onChangeData(String str) {
-    _data = str;
-  }
+  void onChangeData(String str) => _data = str;
 
   Automata renameAutomataVertices() {
     final automata = Automata.expression();

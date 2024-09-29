@@ -1,4 +1,5 @@
-import 'package:computer_system_software/library/custom_painter.dart';
+
+import 'package:computer_system_software/library/painters/automata_painter/automata_painter.dart';
 import 'package:computer_system_software/ui/widgets/lab1/lab1_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,7 @@ class Graph extends StatelessWidget {
     return Column(
       children: [
         CustomPaint(
-          painter: MyPainter(automata: model.renameAutomataVertices()),
+          painter: AutomataPainter(automata: model.renameAutomataVertices()),
           size: Size(size, size),
         ),
         Row(
