@@ -1,8 +1,6 @@
 import 'package:computer_system_software/domain/entities/tree.dart';
 import 'package:computer_system_software/domain/repositories/expression_analyzer_repository.dart';
 import 'package:computer_system_software/domain/repositories/expression_tree_repository.dart';
-import 'package:computer_system_software/library/lexical_analyzer/lexical_analyzer.dart';
-import 'package:computer_system_software/library/lexical_analyzer/token.dart';
 import 'package:computer_system_software/library/painters/binary_tree_painter/binary_tree_painter.dart';
 import 'package:flutter/material.dart';
 

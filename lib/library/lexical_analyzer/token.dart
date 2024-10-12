@@ -20,6 +20,22 @@ class Token extends Equatable {
   final int position;
   final TokenVisibleType visibleType;
 
+  bool get isNumberVariable => type == TokenType.number_variable;
+
+  bool get isPlusMinus => type == TokenType.plus_minus;
+
+  bool get isMultipleDividePower => type == TokenType.multiple_divide_power;
+
+  bool get isFactorial => type == TokenType.factorial;
+
+  bool get isLeftBracket => type == TokenType.leftBracket;
+
+  bool get isRightBracket => type == TokenType.rightBracket;
+
+  bool get isFunction => type == TokenType.factorial;
+
+  bool get isEof => type == TokenType.eof;
+
   const Token({
     required this.type,
     required this.value,

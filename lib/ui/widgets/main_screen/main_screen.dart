@@ -17,7 +17,7 @@ class MainScreen extends StatelessWidget {
 class _BodyWidget extends StatelessWidget {
   const _BodyWidget();
 
-  final countLabs = 2;
+  final countLabs = 3;
 
   @override
   Widget build(BuildContext context) {
