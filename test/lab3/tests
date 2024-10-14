@@ -1,11 +1,11 @@
 a*b-d*c*e+k*m-y+i*j-n*p*o+x-f                                                                       : a*b-d*c*e+k*m-y+i*j-n*p*o+x-f
 -d*c*e-n*p*o+a*b+k*m+i*j-y+x-f                                                                      : -d*c*e-n*p*o+a*b+k*m+i*j-y+x-f
 
-a*b-(d*c*e)+(k*m-y+i*j-n)*p*o+x-f       (236/144)
-a*b-d*c*e+k*m-y+i*j-n*p*o+x-f           (560/280)
+a*b-(d*c*e)+(k*m-y+i*j-n)*p*o+x-f       (236)
+a*b-d*c*e+k*m-y+i*j-n*p*o+x-f           (560)
 a+b+(c+d)                               (1)
-a+b+(c+d)*(e+f)                         (3/2)
+a+b+(c+d)*(e+f)                         (3)
 a+a+a+a+a+a+a+a+a+a+a+a+a+a+a+a         (1)
-a+b*c+d*e*f                             (6/3)
-a+b*c+d*e+f*g                           (4/2)
-a+b*c+d                                 (3/2)
+a+b*c+d*e*f                             (6)
+a+b*c+d*e+f*g                           (4)
+a+b*c+d                                 (3)
