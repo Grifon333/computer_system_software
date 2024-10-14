@@ -36,7 +36,6 @@ class Lab3Model extends ChangeNotifier {
     initialTree = null;
     resultTree = null;
     countLoops = 0;
-    // Stopwatch stopwatch = Stopwatch()..start();
     List<Token> tokens = _expressionAnalyzerRepository.analyze(data);
     String oldData = data;
     while (true) {
@@ -48,17 +47,13 @@ class Lab3Model extends ChangeNotifier {
     }
 
     int height = initialTree?.height ?? 0;
-    // debugPrint('Analyzer time: ${stopwatch.elapsed.inMilliseconds} ms');
-    // stopwatch.reset();
     final splitTokens = _splitTerms(tokens);
     permutations = _permutation(splitTokens)
         .map((el) => _joinTokens(el).join())
         .toSet()
         .toList();
-    // debugPrint('Permutation time: ${stopwatch.elapsed.inMilliseconds} ms');
     debugPrint('Count Loops: $countLoops');
     debugPrint('Old height: $height');
-    // stopwatch.reset();
     int expIndex = 0;
     for (int i = 0; i < permutations.length; i++) {
       final t = _expressionTreeRepository.build(
@@ -75,7 +70,6 @@ class Lab3Model extends ChangeNotifier {
         .build(_expressionAnalyzerRepository.analyze(permutations[expIndex]));
     debugPrint('New height: $height');
     debugPrint('Expression: (${expIndex + 1})  ${permutations[expIndex]}');
-    // debugPrint('Build Trees time: ${stopwatch.elapsed.inMilliseconds} ms');
     debugPrint('----------------------------------------------\n');
     notifyListeners();
   }
@@ -89,37 +83,61 @@ class Lab3Model extends ChangeNotifier {
     List<List<dynamic>> result = [
       [...list]
     ];
-    var (innerPerms, indexes, lists) = _innerPermutationsList(list);
+    var (innerPerms, indexesPerms, indexesLists) = _innerPermutationsList(list);
     final int n = arr.length;
+    result.addAll(_innerPermutations(innerPerms, arr, indexesPerms, true));
+    if (indexesLists.length < 2) return result;
 
-    result.addAll(_innerPermutations(innerPerms, arr, indexes, true));
-    if (lists.length < 2) return result;
-
-    final List<int> p = List.generate(n, (i) => i);
-    int i = 1;
-
-    while (i < n) {
-      countLoops++;
-      p[i]--;
-      int j = (i % 2) * p[i];
-      if (arr[i] is List &&
-          arr[j] is List &&
-          !_equalsArraysLength(arr[i], arr[j])) {
-        final t = arr[i];
-        arr[i] = arr[j];
-        arr[j] = t;
-        if (!result.any((el) => _equalsArraysLength(el, arr))) {
-          result.add([...arr]);
-          final oldIndexes = [...indexes];
-          if (oldIndexes.contains(i)) indexes[oldIndexes.indexOf(i)] = j;
-          if (oldIndexes.contains(j)) indexes[oldIndexes.indexOf(j)] = i;
-          result.addAll(_innerPermutations(innerPerms, arr, indexes));
-        }
+    List<List<int>> indexGroups = [];
+    List<int> indexGroup = [indexesLists[0]];
+    for (int ind in indexesLists.skip(1)) {
+      if (ind == indexGroup.last + 1) {
+        indexGroup.add(ind);
+      } else {
+        if (indexGroup.length > 1) indexGroups.add(indexGroup);
+        indexGroup = [ind];
       }
-      i = 1;
-      while (i < n && p[i] == 0) {
-        p[i] = i;
-        i++;
+    }
+    if (indexGroup.length > 1) indexGroups.add(indexGroup);
+    if (indexGroups.isEmpty) return result;
+
+    for (List<int> group in indexGroups) {
+      final List<int> p = List.generate(group.length, (i) => i);
+      int i = 1;
+
+      while (i < n) {
+        countLoops++;
+        p[i]--;
+        int j = (i % 2) * p[i];
+        int firstIndex = group[i];
+        int secondIndex = group[j];
+
+        if (!_equalsArraysLength(arr[firstIndex], arr[secondIndex])) {
+          final t = arr[firstIndex];
+          arr[firstIndex] = arr[secondIndex];
+          arr[secondIndex] = t;
+          if (!result.any((el) => _equalsArraysLength(el, arr))) {
+            result.add([...arr]);
+            final oldIndexes = [...indexesPerms];
+            bool isUpdateIndexes = false;
+            if (oldIndexes.contains(firstIndex)) {
+              indexesPerms[oldIndexes.indexOf(firstIndex)] = secondIndex;
+              isUpdateIndexes = true;
+            }
+            if (oldIndexes.contains(secondIndex)) {
+              indexesPerms[oldIndexes.indexOf(secondIndex)] = firstIndex;
+              isUpdateIndexes = true;
+            }
+            if (isUpdateIndexes) {
+              result.addAll(_innerPermutations(innerPerms, arr, indexesPerms));
+            }
+          }
+        }
+        i = 1;
+        while (i < n && p[i] == 0) {
+          p[i] = i;
+          i++;
+        }
       }
     }
     return result;
@@ -160,28 +178,25 @@ class Lab3Model extends ChangeNotifier {
 
   (
     List<List<dynamic>> innerPermutations,
-    List<int> indexes,
-    List<int> countLists,
+    List<int> indexesPermutation,
+    List<int> indexesLists,
   ) _innerPermutationsList(List<dynamic> list) {
     List<List<dynamic>> innerPermutations = [];
-    List<int> indexes = [];
-    Set<int> listsSet = {};
+    List<int> indexesPermutation = [];
+    List<int> indexesLists = [];
     for (int i = 0; i < list.length; i++) {
       if (list[i] is List<dynamic>) {
         String key = list[i].toString();
-        listsSet.add((list[i] as List).length);
+        indexesLists.add(i);
         if (!perms.containsKey(key)) {
           perms[key] = _permutation(list[i]);
         }
         if (perms[key]?.length == 1) continue;
         innerPermutations.add(perms[key]!);
-        indexes.add(i);
+        indexesPermutation.add(i);
       }
     }
-    if (listsSet.length == 1) listsSet.clear();
-    final lists = listsSet.toList();
-    lists.sort();
-    return (innerPermutations, indexes, lists);
+    return (innerPermutations, indexesPermutation, indexesLists);
   }
 
   List<dynamic> _splitTerms(List<Token> tokens) {
