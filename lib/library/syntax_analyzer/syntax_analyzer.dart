@@ -55,7 +55,8 @@ class SyntaxAnalyzer {
       _index++;
     }
     _index--;
-    for (Token token in _bracketsStack.reversed) {
+    while (_bracketsStack.isNotEmpty) {
+      Token token = _bracketsStack.removeLast();
       String value = token.value;
       _insertToken(
         TokenType.rightBracket,
@@ -68,7 +69,7 @@ class SyntaxAnalyzer {
             bracket: _bracketsLtoR[token.value] ?? '', rightBracket: true),
       );
     }
-    _bracketsStack.clear();
+    _removeUnnecessaryBrackets();
     return _newTokens;
   }
 
@@ -202,5 +203,31 @@ class SyntaxAnalyzer {
     _onAddException(token.position, BracketException(bracket: value));
     _newTokens.removeAt(_index);
     return false;
+  }
+
+  void _removeUnnecessaryBrackets() {
+    List<(int, Token)> st = [];
+    for (int i = 0; i < _newTokens.length; i++) {
+      Token t = _newTokens[i];
+      if (t.isLeftBracket) {
+        st.add((i, t));
+      } else if (t.isRightBracket) {
+        var (leftInd, top) = st.removeLast();
+        Token nextToken = _newTokens[i + 1];
+        Token? prevToken;
+        if (leftInd - 1 >= 0) prevToken = _newTokens[leftInd - 1];
+        if (((prevToken == null ||
+                    prevToken.isLeftBracket ||
+                    prevToken.value == '+') &&
+                (!nextToken.isMultipleDividePower && !nextToken.isFactorial)) ||
+            (prevToken != null &&
+                !prevToken.isFunction &&
+                (i - leftInd) == 2)) {
+          _newTokens.removeAt(i);
+          _newTokens.removeAt(leftInd);
+          i -= 2;
+        }
+      }
+    }
   }
 }

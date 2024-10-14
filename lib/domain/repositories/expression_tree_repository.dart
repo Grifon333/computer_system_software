@@ -6,9 +6,17 @@ import 'package:computer_system_software/library/stringExtensions.dart';
 
 class ExpressionTreeRepository {
   Tree? _tree;
+  bool _isExpressionAbbreviation = true;
+  bool _isRotationTree = true;
 
-  Tree? build(List<Token> tokens) {
+  Tree? build(
+    List<Token> tokens, {
+    bool isExpressionAbbreviation = true,
+    bool isRotationTree = true,
+  }) {
     _tree = null;
+    _isExpressionAbbreviation = isExpressionAbbreviation;
+    _isRotationTree = isRotationTree;
     List<Token> list = _expressionToPost(tokens);
     _tree = _postToTree(list);
     _optimizations();
@@ -18,8 +26,8 @@ class ExpressionTreeRepository {
   void _optimizations() {
     Tree? oldTree = _tree;
     while (true) {
-      _tree = _expressionAbbreviation(_tree);
-      _tree = _optimizationTree(_tree);
+      if (_isExpressionAbbreviation) _tree = _expressionAbbreviation(_tree);
+      if (_isRotationTree) _tree = _rotationTree(_tree);
       if (oldTree == _tree) return;
       oldTree = _tree;
     }
@@ -120,7 +128,7 @@ class ExpressionTreeRepository {
         _ => 4,
       };
 
-  Tree? _optimizationTree(Tree? node) {
+  Tree? _rotationTree(Tree? node) {
     if (node == null) return null;
     Tree? oldNode = node;
     while (true) {
@@ -135,8 +143,8 @@ class ExpressionTreeRepository {
       if (node == oldNode) break;
       oldNode = node;
     }
-    node?.leftChild = _optimizationTree(node.leftChild);
-    node?.rightChild = _optimizationTree(node.rightChild);
+    node?.leftChild = _rotationTree(node.leftChild);
+    node?.rightChild = _rotationTree(node.rightChild);
     return node;
   }
 
@@ -158,6 +166,7 @@ class ExpressionTreeRepository {
     int leftLeftHeight = node.leftChild?.leftChild?.height ?? 0;
     int leftRightHeight = node.leftChild?.rightChild?.height ?? 0;
     String root = node.root.value;
+    if (node.root.type == TokenType.function) return node;
     String? left = node.leftChild?.root.value;
     if (leftRightHeight > leftLeftHeight &&
         node.root.type == node.leftChild?.rightChild?.root.type) {
@@ -182,6 +191,7 @@ class ExpressionTreeRepository {
     int rightLeftHeight = node.rightChild?.leftChild?.height ?? 0;
     int rightRightHeight = node.rightChild?.rightChild?.height ?? 0;
     String root = node.root.value;
+    if (node.root.type == TokenType.function) return node;
     if (rightLeftHeight > rightRightHeight &&
         node.root.type == node.rightChild?.leftChild?.root.type) {
       node = _leftChangeOperations(node, node.root.type);
@@ -392,7 +402,8 @@ class ExpressionTreeRepository {
     if (tree.rightChild != null) {
       String right = treeToExpression(tree.rightChild!);
       if (!_comparePriority(tree.rightChild!.root, root) ||
-          (root.value == '-' && tree.rightChild!.root.value == '+')) {
+          ((root.value == '-' || root.isMultipleDividePower) &&
+              tree.rightChild!.root.isPlusMinus) || root.isFunction) {
         right = '($right)';
       }
       list.add(right);

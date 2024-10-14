@@ -32,7 +32,7 @@ class Token extends Equatable {
 
   bool get isRightBracket => type == TokenType.rightBracket;
 
-  bool get isFunction => type == TokenType.factorial;
+  bool get isFunction => type == TokenType.function;
 
   bool get isEof => type == TokenType.eof;
 
