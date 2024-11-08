@@ -92,7 +92,12 @@ class CommutativeLawRepository {
     for (int i = 0; i < a.length; i++) {
       if ((a[i] is List && b[i] is List && !_equalsArraysLength(a[i], b[i])) ||
           (a[i] is! List && b[i] is List) ||
-          (a[i] is List && b[i] is! List)) {
+          (a[i] is List && b[i] is! List) ||
+          (a[i] is Token &&
+              b[i] is Token &&
+              a[i].type == TokenType.plus_minus &&
+              b[i].type == TokenType.plus_minus &&
+              a[i].value != b[i].value)) {
         return false;
       }
     }
@@ -182,6 +187,7 @@ class CommutativeLawRepository {
     terms.add(term);
 
     terms = _joinConstants(terms);
+    terms.removeWhere((el) => (el is List && el.isEmpty));
     if (terms.length == 1) return terms.first;
     return terms;
   }
