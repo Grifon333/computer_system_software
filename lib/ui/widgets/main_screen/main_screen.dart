@@ -5,35 +5,25 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    const countLabs = 4;
+
+    return Scaffold(
       body: SafeArea(
-        child: _BodyWidget(),
-      ),
-      // backgroundColor: Colors.white24,
-    );
-  }
-}
-
-class _BodyWidget extends StatelessWidget {
-  const _BodyWidget();
-
-  final countLabs = 3;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: List.generate(
-        6,
-        (index) {
-          index++;
-          return _ButtonWidget(
-            title: 'Lab $index',
-            onPressed: index <= countLabs
-                ? () => Navigator.of(context).pushNamed('/lab$index')
-                : null,
-          );
-        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: List.generate(
+            6,
+            (index) {
+              index++;
+              return _ButtonWidget(
+                title: 'Lab $index',
+                onPressed: index <= countLabs
+                    ? () => Navigator.of(context).pushNamed('/lab$index')
+                    : null,
+              );
+            },
+          ),
+        ),
       ),
     );
   }
