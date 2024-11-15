@@ -27,3 +27,5 @@ a+b*c+d                                 (3)
 'a+a*a+a+a+a+a+a+a+a+a+a',
 '-a+(v+p*(6-h+b*(d+u+5+10)))',
 a+b*c*d*e+m+g/h+k+z*(r+f)+n
+-(a+b-c)
+(a*k-b)*(-c)-s
