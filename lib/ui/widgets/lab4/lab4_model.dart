@@ -1,5 +1,6 @@
 import 'package:computer_system_software/domain/entities/tree.dart';
 import 'package:computer_system_software/domain/repositories/expression_analyzer_repository.dart';
+import 'package:computer_system_software/domain/repositories/expression_tree_repository.dart';
 import 'package:computer_system_software/library/lexical_analyzer/token.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,8 @@ class Lab4Model extends ChangeNotifier {
   String data = '';
   final ExpressionAnalyzerRepository _expressionAnalyzerRepository =
       ExpressionAnalyzerRepository();
+  final ExpressionTreeRepository _expressionTreeRepository =
+      ExpressionTreeRepository();
 
   final plus = const Token(type: TokenType.plus_minus, value: '+');
   final minus = const Token(type: TokenType.plus_minus, value: '-');
@@ -23,16 +26,18 @@ class Lab4Model extends ChangeNotifier {
   void onChange(String value) => data = value;
 
   void onPressed() {
-    changeExpression(data);
-    // print(convertTermsToTokens(terms).join());
+    print(changeExpression(data));
+    notifyListeners();
   }
+
+  String termListToString(List list) =>
+      list.map((el) => el is List ? '(${termListToString(el)})' : '$el').join();
 
   List changeExpression(String expression) {
     List<Token> tokens = _expressionAnalyzerRepository.analyze(expression);
+    initialTree = _expressionTreeRepository.build(tokens);
     index = 0;
-    List terms = _splitTerms(tokens);
-    terms = removeBrackets(terms);
-    terms = changeSings(terms);
+    List terms = changeSings(removeBrackets(_splitTerms(tokens)));
     return terms;
   }
 
@@ -42,19 +47,17 @@ class Lab4Model extends ChangeNotifier {
     if (tokens[index].isPlusMinus) terms.add(tokens[index++]);
     for (; index < tokens.length; index++) {
       Token token = tokens[index];
-      if (token.isPlusMinus) {
-        terms.add(currTerm);
-        terms.add(token);
-        currTerm = [];
-      } else if (token.value == '*' || token.value == '/') {
+      if (token.isPlusMinus || token.value == '*' || token.value == '/') {
         terms.add(currTerm);
         terms.add(token);
         currTerm = [];
       } else if (token.isLeftBracket) {
         index++;
         final innerTerms = _splitTerms(tokens);
-        if (innerTerms.length == 1) {
-          currTerm.add(innerTerms.first);
+        if (currTerm.isNotEmpty &&
+            currTerm.last is Token &&
+            (currTerm.last as Token).isFunction) {
+          currTerm.add(innerTerms);
         } else {
           currTerm.addAll(innerTerms);
         }
@@ -65,39 +68,21 @@ class Lab4Model extends ChangeNotifier {
       }
     }
     terms.add(currTerm);
-    // terms = _joinConstants(terms);
+    // TODO: terms = _joinConstants(terms);
     terms.removeWhere((el) => el is List && el.isEmpty);
-    if (terms.length == 1 && terms.first is List) return terms.first;
-    return terms;
-  }
-
-  List<Token> convertTermsToTokens(List terms) {
-    List<Token> tokens = [];
-    for (var el in terms) {
-      if (el is List) {
-        final innerTokens = convertTermsToTokens(el);
-        if (innerTokens.first.value == '+' && tokens.isEmpty) {
-          innerTokens.removeAt(0);
-        }
-        tokens.addAll(innerTokens);
-      } else if (el is Token) {
-        if (el.value == '+' && tokens.isEmpty) continue;
-        tokens.add(el);
-      }
-    }
-    return tokens;
+    return terms.length == 1 && terms.first is List ? terms.first : terms;
   }
 
   List removeBrackets(List terms) {
     if (terms.length == 1) return terms;
     List newTerms = [];
-    List? prevOperator;
-    List? currOperator;
+    List? prevOperand;
+    List? currOperand;
     Token? operation;
     bool sign = true;
     for (var term in terms) {
       if (term is Token) {
-        if ((term.value == '*' || term.value == '/') && prevOperator != null) {
+        if ((term.value == '*' || term.value == '/') && prevOperand != null) {
           operation = term;
         } else {
           newTerms.add(term);
@@ -109,28 +94,36 @@ class Lab4Model extends ChangeNotifier {
         }
         continue;
       }
-      currOperator = removeBrackets(term);
-      if (prevOperator != null && operation != null) {
+      currOperand = removeBrackets(term);
+      if (prevOperand != null && operation != null) {
         newTerms.removeLast();
         if (newTerms.isNotEmpty) {
           newTerms.removeLast();
         }
+        if (prevOperand.first is Token &&
+            (prevOperand.first as Token).isFunction) {
+          prevOperand = [prevOperand];
+        }
+        if (currOperand.first is Token &&
+            (currOperand.first as Token).isFunction) {
+          currOperand = [currOperand];
+        }
         List innerTerms = operation.value == '*'
-            ? multipleTerms(prevOperator, currOperator, sign)
-            : divideTerms(prevOperator, currOperator, sign);
+            ? multipleTerms(prevOperand, currOperand, sign)
+            : divideTerms(prevOperand, currOperand, sign);
         final firstTerm = innerTerms.first;
         if ((firstTerm is! Token || firstTerm.value != '-') &&
             newTerms.isNotEmpty) {
           newTerms.add(plus);
         }
         operation = null;
-        currOperator = null;
+        currOperand = null;
         newTerms.addAll(innerTerms);
-        prevOperator = innerTerms;
+        prevOperand = innerTerms;
         continue;
       }
-      prevOperator = currOperator;
-      newTerms.add(currOperator);
+      prevOperand = currOperand;
+      newTerms.add(currOperand);
     }
     return newTerms;
   }
@@ -180,14 +173,18 @@ class Lab4Model extends ChangeNotifier {
           int secondDividerIndex = termContainDivider(b);
           if (firstDividerIndex != -1 && secondDividerIndex != -1) {
             List firstLeft = a.getRange(0, firstDividerIndex).toList();
-            List firstRight = a.getRange(firstDividerIndex + 1, a.length).toList();
+            List firstRight =
+                a.getRange(firstDividerIndex + 1, a.length).toList();
             List secondLeft = b.getRange(0, secondDividerIndex).toList();
-            List secondRight = b.getRange(secondDividerIndex + 1, b.length).toList();
+            List secondRight =
+                b.getRange(secondDividerIndex + 1, b.length).toList();
             term.addAll(firstLeft);
             term.add(multiple);
             term.addAll(secondLeft);
             term.add(divide);
-            term.add(firstRight..add(multiple)..addAll(secondRight));
+            term.add(firstRight
+              ..add(multiple)
+              ..addAll(secondRight));
           } else if (firstDividerIndex != -1) {
             List left = a.getRange(0, firstDividerIndex).toList();
             List right = a.getRange(firstDividerIndex + 1, a.length).toList();
@@ -296,7 +293,8 @@ class Lab4Model extends ChangeNotifier {
             ..addAll(second));
         } else if (secondDividerIndex != -1) {
           List left = second.getRange(0, secondDividerIndex).toList();
-          List right = second.getRange(secondDividerIndex + 1, second.length).toList();
+          List right =
+              second.getRange(secondDividerIndex + 1, second.length).toList();
           term.addAll(a);
           term.add(multiple);
           term.addAll(right);
