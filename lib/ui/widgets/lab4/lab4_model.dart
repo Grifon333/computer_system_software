@@ -145,69 +145,38 @@ class Lab4Model extends ChangeNotifier {
         final resultSign = !(signA ^ signB);
         final signToken = resultSign ? plus : minus;
         if (result.isNotEmpty || !resultSign) result.add(signToken);
+        List term = [];
         if (a is! List && b is! List) {
-          result.add([a, multiple, b]);
+          term = [a, multiple, b];
         } else if (a is List && b is! List) {
-          List term = [];
           int dividerIndex = termContainDivider(a);
           if (dividerIndex != -1) {
-            List left = a.getRange(0, dividerIndex).toList();
-            List right = a.getRange(dividerIndex + 1, a.length).toList();
-            term = List.of(left);
-            term.addAll([multiple, b]);
-            term.add(divide);
-            term.addAll(right);
+            List<List> split = splitByDivider(a, dividerIndex);
+            term = [...split[0], multiple, b, divide, ...split[1]];
           } else {
-            term = List.of(a);
-            term.addAll([multiple, b]);
+            term = [...a, multiple, b];
           }
-          result.add(term);
         } else if (a is! List && b is List) {
-          final term = [];
-          term.addAll([a, multiple]);
-          term.addAll(b);
-          result.add(term);
+          term = [a, multiple, ...b];
         } else if (a is List && b is List) {
-          List term = [];
           int firstDividerIndex = termContainDivider(a);
           int secondDividerIndex = termContainDivider(b);
           if (firstDividerIndex != -1 && secondDividerIndex != -1) {
-            List firstLeft = a.getRange(0, firstDividerIndex).toList();
-            List firstRight =
-                a.getRange(firstDividerIndex + 1, a.length).toList();
-            List secondLeft = b.getRange(0, secondDividerIndex).toList();
-            List secondRight =
-                b.getRange(secondDividerIndex + 1, b.length).toList();
-            term.addAll(firstLeft);
-            term.add(multiple);
-            term.addAll(secondLeft);
-            term.add(divide);
-            term.add(firstRight
-              ..add(multiple)
-              ..addAll(secondRight));
+            List<List> firstSplit = splitByDivider(a, firstDividerIndex);
+            List<List> secondSplit = splitByDivider(b, secondDividerIndex);
+            term = [...firstSplit[0], multiple, ...secondSplit[0], divide];
+            term.add([...firstSplit[1], multiple, ...secondSplit[1]]);
           } else if (firstDividerIndex != -1) {
-            List left = a.getRange(0, firstDividerIndex).toList();
-            List right = a.getRange(firstDividerIndex + 1, a.length).toList();
-            term = List.of(left);
-            term.add(multiple);
-            term.addAll(b);
-            term.add(divide);
-            term.addAll(right);
+            List<List> split = splitByDivider(a, firstDividerIndex);
+            term = [...split[0], multiple, ...b, divide, ...split[1]];
           } else if (secondDividerIndex != -1) {
-            List left = b.getRange(0, secondDividerIndex).toList();
-            List right = b.getRange(secondDividerIndex + 1, b.length).toList();
-            term.addAll(a);
-            term.add(multiple);
-            term.addAll(left);
-            term.add(divide);
-            term.addAll(right);
+            List<List> split = splitByDivider(b, secondDividerIndex);
+            term = [...a, multiple, ...split[0], divide, ...split[1]];
           } else {
-            term = List.of(a);
-            term.add(multiple);
-            term.addAll(b);
+            term = [...a, multiple, ...b];
           }
-          result.add(term);
         }
+        result.add(term);
       }
     }
     return result;
@@ -230,83 +199,46 @@ class Lab4Model extends ChangeNotifier {
       final resultSign = !(!(signA ^ signB) ^ outerSign);
       final signToken = resultSign ? plus : minus;
       if (result.isNotEmpty || !resultSign) result.add(signToken);
+      List term = [];
       if (a is! List && second.length == 1) {
-        result.add([a, divide, second.first]);
+        term = [a, divide, second.first];
       } else if (a is List && second.length == 1) {
         int dividerIndex = termContainDivider(a);
-        List term = [];
         if (dividerIndex != -1) {
-          List left = a.getRange(0, dividerIndex).toList();
-          List right = a.getRange(dividerIndex + 1, a.length).toList();
-          term = List.of(left);
-          term.add(divide);
-          term.add(List.of(right)
-            ..add(multiple)
-            ..add(second.first));
+          List<List> split = splitByDivider(a, dividerIndex);
+          term = [...split[0], divide];
+          term.add([...split[1], multiple, second.first]);
         } else {
-          term = List.of(a);
-          term.addAll([divide, second.first]);
+          term = [...a, divide, second.first];
         }
-        result.add(term);
       } else if (a is! List && second.length > 1) {
-        List term = [];
         int dividerIndex = termContainDivider(second);
         if (dividerIndex != -1) {
-          List left = second.getRange(0, dividerIndex).toList();
-          List right =
-              second.getRange(dividerIndex + 1, second.length).toList();
-          term = List.of([a]);
-          term.add(multiple);
-          term.addAll(right);
-          term.add(divide);
-          term.addAll(left);
+          List<List> split = splitByDivider(second, dividerIndex);
+          term = [a, multiple, ...split[1], divide, ...split[0]];
         } else {
-          term.addAll([a, divide]);
-          term.add(second);
+          term = [a, divide, second];
         }
-        result.add(term);
       } else if (a is List && second.length > 1) {
-        List term = [];
         int firstDividerIndex = termContainDivider(a);
         int secondDividerIndex = termContainDivider(second);
         if (firstDividerIndex != -1 && secondDividerIndex != -1) {
-          List firstLeft = a.getRange(0, firstDividerIndex).toList();
-          List firstRight =
-              a.getRange(firstDividerIndex + 1, a.length).toList();
-          List secondLeft = second.getRange(0, secondDividerIndex).toList();
-          List secondRight =
-              second.getRange(secondDividerIndex + 1, second.length).toList();
-          term.addAll(firstLeft);
-          term.add(multiple);
-          term.addAll(secondRight);
-          term.add(divide);
-          term.add(firstRight
-            ..add(multiple)
-            ..addAll(secondLeft));
+          List<List> firstSplit = splitByDivider(a, firstDividerIndex);
+          List<List> secondSplit = splitByDivider(second, secondDividerIndex);
+          term = [...firstSplit[0], multiple, ...secondSplit[1], divide];
+          term.add([...firstSplit[1], multiple, ...secondSplit[0]]);
         } else if (firstDividerIndex != -1) {
-          List left = a.getRange(0, firstDividerIndex).toList();
-          List right = a.getRange(firstDividerIndex + 1, a.length).toList();
-          term.addAll(left);
-          term.add(divide);
-          term.add(right
-            ..add(multiple)
-            ..addAll(second));
+          List<List> split = splitByDivider(a, firstDividerIndex);
+          term = [...split[0], divide];
+          term.add([...split[1], multiple, ...second]);
         } else if (secondDividerIndex != -1) {
-          List left = second.getRange(0, secondDividerIndex).toList();
-          List right =
-              second.getRange(secondDividerIndex + 1, second.length).toList();
-          term.addAll(a);
-          term.add(multiple);
-          term.addAll(right);
-          term.add(divide);
-          term.addAll(left);
+          List<List> split = splitByDivider(second, secondDividerIndex);
+          term = [...a, multiple, ...split[1], divide, ...split[0]];
         } else {
-          term = List.of(a);
-          term.add(divide);
-          term.add(second);
+          term = [...a, divide, second];
         }
-        result.add(term);
       }
+      result.add(term);
     }
     return result;
   }
@@ -317,6 +249,10 @@ class Lab4Model extends ChangeNotifier {
       if (el is Token && el.value == '/') return i;
     }
     return -1;
+  }
+
+  List<List> splitByDivider(List list, int dividerIndex) {
+    return [list.sublist(0, dividerIndex), list.sublist(dividerIndex + 1)];
   }
 
   List changeSings(List terms) {
@@ -368,3 +304,4 @@ class Lab4Model extends ChangeNotifier {
     return newTerms;
   }
 }
+// 371
