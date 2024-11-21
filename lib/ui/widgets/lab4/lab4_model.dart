@@ -26,7 +26,7 @@ class Lab4Model extends ChangeNotifier {
   void onChange(String value) => data = value;
 
   void onPressed() {
-    print(changeExpression(data));
+    changeExpression(data);
     notifyListeners();
   }
 
@@ -37,7 +37,15 @@ class Lab4Model extends ChangeNotifier {
     List<Token> tokens = _expressionAnalyzerRepository.analyze(expression);
     initialTree = _expressionTreeRepository.build(tokens);
     index = 0;
-    List terms = changeSings(removeBrackets(_splitTerms(tokens)));
+    List<List> variants = removeBrackets(_splitTerms(tokens))
+        .map((el) => changeSings(el))
+        .toList();
+    for (var variant in variants) {
+      debugPrint('$variant');
+    }
+    List terms = variants.first;
+    tokens = _expressionAnalyzerRepository.analyze(termListToString(terms));
+    resultTree = _expressionTreeRepository.build(tokens);
     return terms;
   }
 
@@ -73,59 +81,56 @@ class Lab4Model extends ChangeNotifier {
     return terms.length == 1 && terms.first is List ? terms.first : terms;
   }
 
-  List removeBrackets(List terms) {
-    if (terms.length == 1) return terms;
+  List<List> removeBrackets(List terms) {
+    if (terms.length == 1) return [terms];
+    List<List> variants = [];
     List newTerms = [];
-    List? prevOperand;
     List? currOperand;
     Token? operation;
-    bool sign = true;
     for (var term in terms) {
       if (term is Token) {
-        if ((term.value == '*' || term.value == '/') && prevOperand != null) {
-          operation = term;
-        } else {
-          newTerms.add(term);
-          if (term.value == '-') {
-            sign = false;
-          } else if (term.value == '+') {
-            sign = true;
-          }
-        }
+        (term.value == '*' || term.value == '/')
+            ? operation = term
+            : newTerms.add(term);
         continue;
       }
-      currOperand = removeBrackets(term);
-      if (prevOperand != null && operation != null) {
-        newTerms.removeLast();
-        if (newTerms.isNotEmpty) {
-          newTerms.removeLast();
-        }
-        if (prevOperand.first is Token &&
-            (prevOperand.first as Token).isFunction) {
-          prevOperand = [prevOperand];
-        }
-        if (currOperand.first is Token &&
-            (currOperand.first as Token).isFunction) {
-          currOperand = [currOperand];
-        }
-        List innerTerms = operation.value == '*'
-            ? multipleTerms(prevOperand, currOperand, sign)
-            : divideTerms(prevOperand, currOperand, sign);
-        final firstTerm = innerTerms.first;
-        if ((firstTerm is! Token || firstTerm.value != '-') &&
-            newTerms.isNotEmpty) {
-          newTerms.add(plus);
-        }
+      currOperand = removeBrackets(term).first;
+      if (operation != null) {
+        newTerms.add(operationTerms(newTerms, currOperand, operation));
         operation = null;
         currOperand = null;
-        newTerms.addAll(innerTerms);
-        prevOperand = innerTerms;
         continue;
       }
-      prevOperand = currOperand;
       newTerms.add(currOperand);
     }
-    return newTerms;
+    newTerms = removeNesting(newTerms);
+    return [newTerms];
+  }
+
+  List operationTerms(List newTerms, List currOperand, Token operation) {
+    List prevOperand = newTerms.removeLast();
+    bool sign = true;
+    if (newTerms.isNotEmpty) sign = newTerms.removeLast().value == '+';
+    if (termIsFunction(prevOperand)) prevOperand = [prevOperand];
+    if (termIsFunction(currOperand)) currOperand = [currOperand];
+    List innerTerms = operation.value == '*'
+        ? multipleTerms(prevOperand, currOperand, sign)
+        : divideTerms(prevOperand, currOperand, sign);
+    if (needAddPlus(innerTerms) && newTerms.isNotEmpty) newTerms.add(plus);
+    return innerTerms;
+  }
+
+  List removeNesting(List list) {
+    return (list.length == 1 && list.first is List) ? list.first : list;
+  }
+
+  bool termIsFunction(List term) {
+    return (term.first is Token && (term.first as Token).isFunction);
+  }
+
+  bool needAddPlus(List innerTerms) {
+    final firstTerm = innerTerms.first;
+    return (firstTerm is! Token || firstTerm.value != '-');
   }
 
   List multipleTerms(List first, List second, bool outerSign) {
@@ -136,12 +141,14 @@ class Lab4Model extends ChangeNotifier {
         if (a.isPlusMinus) signA = a.value == '+';
         continue;
       }
+      if (a is List && a.length == 1) a = a.first;
       bool signB = true;
       for (var b in second) {
         if (b is Token && !b.isNumberVariable) {
           if (b.isPlusMinus) signB = b.value == '+';
           continue;
         }
+        if (b is List && b.length == 1) b = b.first;
         final resultSign = !(signA ^ signB);
         final signToken = resultSign ? plus : minus;
         if (result.isNotEmpty || !resultSign) result.add(signToken);
@@ -304,4 +311,3 @@ class Lab4Model extends ChangeNotifier {
     return newTerms;
   }
 }
-// 371
