@@ -48,3 +48,7 @@ f(a)*f(b)                   : [[f[a]*f[b]]]
 f(a)/f(b)                   : [[f[a]/f[b]]]
 (f(a)/f(b))/(f(c)/f(d))     : [[f[a]*f[d]/[f[b]*f[c]]]]
 (f(a)/f(b))*(f(c)/f(d))     : [[f[a]*f[c]/[f[b]*f[d]]]]
+
+a*(b+c)*d                   : [[a*b*d]+[a*c*d]]
+
+[ln(y!)+(log2(4.5*y))-lg(y+sqrt(5))] / [log10(2.3+y)*y]

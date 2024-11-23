@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:computer_system_software/library/lexical_analyzer/lexical_analyzer.dart';
 import 'package:computer_system_software/ui/widgets/lab4/lab4.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../assets/file_path.dart';
@@ -15,8 +16,8 @@ Future<void> main() async {
     String expression = line.first.trim();
     String mather = line.last.trim();
     test('Test ${i + 1}', () {
-      final result = model.changeExpression(expression);
-      print('${expression.padRight(20, ' ')} | ${toStr(result)}\n');
+      final result = model.changeExpression(expression).first;
+      debugPrint('${expression.padRight(20, ' ')} | ${toStr(result)}\n');
       expect(toStr(result), mather);
     });
   }
