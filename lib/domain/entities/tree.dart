@@ -16,6 +16,8 @@ class Tree extends painter.Tree<Token> with EquatableMixin {
   @override
   Tree? get rightChild => super.rightChild as Tree?;
 
+  bool get isLeaf => (leftChild == null && rightChild == null);
+
   @override
   String getRoot() {
     return root.value;

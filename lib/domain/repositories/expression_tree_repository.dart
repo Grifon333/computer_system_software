@@ -402,8 +402,9 @@ class ExpressionTreeRepository {
     if (tree.rightChild != null) {
       String right = treeToExpression(tree.rightChild!);
       if (!_comparePriority(tree.rightChild!.root, root) ||
-          ((root.value == '-' || root.isMultipleDividePower) &&
-              tree.rightChild!.root.isPlusMinus) || root.isFunction) {
+          ((root.value == '-' || root.value == '/' || root.value == '^') &&
+              !tree.rightChild!.isLeaf) ||
+          root.isFunction) {
         right = '($right)';
       }
       list.add(right);
@@ -412,3 +413,11 @@ class ExpressionTreeRepository {
     return list.join();
   }
 }
+
+/*
+if (!_comparePriority(tree.rightChild!.root, root) ||
+          ((root.value == '-' || root.value == '/' || root.value == '^') &&
+              !tree.rightChild!.isLeaf) ||
+          root.isFunction) {
+        right = '($right)';
+ */
