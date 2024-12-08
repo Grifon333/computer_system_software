@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:computer_system_software/domain/entities/tree.dart';
 import 'package:computer_system_software/library/lexical_analyzer/token.dart';
-import 'package:computer_system_software/library/stringExtensions.dart';
+import 'package:computer_system_software/library/string_extensions.dart';
 
 class ExpressionTreeRepository {
   Tree? _tree;

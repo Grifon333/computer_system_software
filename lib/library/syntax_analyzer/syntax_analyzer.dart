@@ -1,6 +1,6 @@
 import 'package:computer_system_software/library/arithmetic_exception.dart';
 import 'package:computer_system_software/library/syntax_analyzer/automata.dart';
-import 'package:computer_system_software/library/stringExtensions.dart';
+import 'package:computer_system_software/library/string_extensions.dart';
 import 'package:computer_system_software/library/lexical_analyzer/token.dart';
 
 class SyntaxAnalyzer {
