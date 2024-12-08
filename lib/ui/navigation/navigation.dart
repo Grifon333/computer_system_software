@@ -5,12 +5,15 @@ import 'package:computer_system_software/ui/widgets/lab4/lab4.dart';
 import 'package:computer_system_software/ui/widgets/main_screen/main_screen.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/lab5/lab5.dart';
+
 class MainNavigationMainRoute {
   static const main = '/';
   static const lab1 = '/lab1';
   static const lab2 = '/lab2';
   static const lab3 = '/lab3';
   static const lab4 = '/lab4';
+  static const lab5 = '/lab5';
 }
 
 class MainNavigation {
@@ -36,5 +39,10 @@ class MainNavigation {
           lazy: false,
           child: const Lab4Page(),
         ),
+    MainNavigationMainRoute.lab5: (_) => ChangeNotifierProvider(
+      create: (_) => Lab5Model(),
+      lazy: false,
+      child: const Lab5Page(),
+    ),
   };
 }
