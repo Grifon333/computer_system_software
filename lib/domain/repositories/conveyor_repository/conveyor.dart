@@ -11,7 +11,6 @@ class Conveyor {
     required this.operationIndexes,
   });
 
-  // TODO
   void addOperation(int position, int operationIndex, int operationTime) {
     operationIndexes[position] = operationIndex;
     width = max(width, operationTime);

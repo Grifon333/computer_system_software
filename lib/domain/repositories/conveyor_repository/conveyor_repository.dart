@@ -9,15 +9,10 @@ part 'conveyor.dart';
 
 part 'double_extension.dart';
 
-class ConveyorRepository {
-  // time of operations
-  final int _plusTime;
-  final int _minusTime;
-  final int _multipleTime;
-  final int _divideTime;
-  final int _functionTime;
+part 'conveyor_config.dart';
 
-  final int _layersCount;
+class ConveyorRepository {
+  final ConveyorConfig _config;
 
   int _linearTime = 0;
   int _realTime = 0;
@@ -33,41 +28,24 @@ class ConveyorRepository {
   int _lastCheckConveyor = 0; // for Write
   final Set<int> _markedOperation = {};
 
+  Map<int, String> get operationByIndex =>
+      _tokenByIndex.map((ind, token) => MapEntry(ind, token.value));
+
   ConveyorRepository({
-    required int plusTime,
-    required int minusTime,
-    required int multipleTime,
-    required int divideTime,
-    required int functionTime,
-    int readTime = 1,
-    int writeTime = 1,
-    required int layersCount,
-  })  : _functionTime = functionTime,
-        _divideTime = divideTime,
-        _multipleTime = multipleTime,
-        _minusTime = minusTime,
-        _plusTime = plusTime,
-        _layersCount = layersCount;
+    required ConveyorConfig config,
+  }) : _config = config;
 
-  void addConveyor() {
-    _conveyors.add(
-      Conveyor(width: 1, operationIndexes: List.filled(_layersCount, -1)),
-    );
-  }
-
-  void execute(Tree tree) {
+  (List<Conveyor>, int, double, double)? execute(Tree? tree) {
+    if (tree == null) return null;
     _reset();
     Tree? newTree = tree.copyWith();
     _removeLeaves(newTree);
     _indexedTree = _makeIndexedTree(newTree);
-    if (_indexedTree == null) return;
+    if (_indexedTree == null) return null;
     _linearTime = _calculateLinearTime(_indexedTree);
     _fillConveyors();
     _calculateCoefficients();
-    print(_conveyors.join('\n'));
-    print('Real time: $_realTime');
-    print('Productivity: $_productivity');
-    print('Efficient: $_efficient');
+    return (_conveyors, _realTime, _productivity, _efficient);
   }
 
   void _reset() {
@@ -82,9 +60,16 @@ class ConveyorRepository {
     _lastCheckConveyor = 0;
     _indexedTree = null;
     _markedOperation.clear();
-    for (int i = 0; i <= _layersCount; i++) {
-      addConveyor();
+    for (int i = 0; i <= _config.layersCount; i++) {
+      _addConveyor();
     }
+  }
+
+  void _addConveyor() {
+    _conveyors.add(
+      Conveyor(
+          width: 1, operationIndexes: List.filled(_config.layersCount, -1)),
+    );
   }
 
   void _fillConveyors() {
@@ -103,7 +88,7 @@ class ConveyorRepository {
       _markedOperation.addAll(leaves.map((el) => el.index));
       if (leaves.isEmpty) {
         _currentConveyor++;
-        addConveyor();
+        _addConveyor();
         continue;
       }
       leaves.sort(_compareOperationTimes);
@@ -130,15 +115,15 @@ class ConveyorRepository {
         _conveyors[_currentConveyor - 1].read = operationIndex;
       }
     }
-    for (int i = 0; i < _layersCount; i++) {
+    for (int i = 0; i < _config.layersCount; i++) {
       _conveyors[_currentConveyor + i].addOperation(
         i,
         operationIndex,
         _getOperationTime(_tokenByIndex[operationIndex]),
       );
     }
-    addConveyor();
-    _conveyors[_currentConveyor + _layersCount].write = operationIndex;
+    _addConveyor();
+    _conveyors[_currentConveyor + _config.layersCount].write = operationIndex;
   }
 
   int _compareOperationTimes(IndexedTree one, IndexedTree two) {
@@ -146,11 +131,11 @@ class ConveyorRepository {
   }
 
   int _getOperationTime(Token? token) => switch (token?.value) {
-        '+' => _plusTime,
-        '-' => _minusTime,
-        '*' => _multipleTime,
-        '/' => _divideTime,
-        _ => _functionTime,
+        '+' => _config.plusTime,
+        '-' => _config.minusTime,
+        '*' => _config.multipleTime,
+        '/' => _config.divideTime,
+        _ => _config.functionTime,
       };
 
   List<IndexedTree> _getLeaves(IndexedTree? tree) {
@@ -188,10 +173,11 @@ class ConveyorRepository {
   }
 
   void _calculateCoefficients() {
+    final layersCount = _config.layersCount;
     for (int i = 0; i < _conveyors.length; i++) {
       _realTime += _conveyors[i].width;
     }
-    _productivity = ((_linearTime * _layersCount + 2) / _realTime).roundNum(3);
-    _efficient = (_productivity / _layersCount).roundNum(3);
+    _productivity = ((_linearTime * layersCount + 2) / _realTime).roundNum(3);
+    _efficient = (_productivity / layersCount).roundNum(3);
   }
 }
