@@ -27,9 +27,9 @@ class _Body extends StatelessWidget {
           const Permutations(),
           const SizedBox(height: 20),
           LayoutBuilder(builder: (
-              BuildContext context,
-              BoxConstraints constraints,
-              ) {
+            BuildContext context,
+            BoxConstraints constraints,
+          ) {
             final maxWidth = constraints.maxWidth;
             if (constraints.maxWidth < 600) {
               return Column(
@@ -54,4 +54,3 @@ class _Body extends StatelessWidget {
     );
   }
 }
-

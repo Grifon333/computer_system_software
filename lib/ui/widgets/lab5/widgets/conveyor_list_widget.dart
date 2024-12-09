@@ -29,14 +29,14 @@ class ConveyorWidget extends StatelessWidget {
     final model = context.read<Lab5Model>();
     final cycle = model.cycles[index];
     int countLayers = model.layersCount;
-    const style = TextStyle(fontSize: 18, fontWeight: FontWeight.w700);
+    const style = TextStyle(fontSize: 16, fontWeight: FontWeight.w700);
     return Row(
       children: [
         Cell(value: '(${index + 1})'),
         Cell(value: cycle.read, style: style),
         ...List.generate(
           countLayers,
-              (i) => CellWidget(cellModel: cycle.items[i], style: style),
+          (i) => CellWidget(cellModel: cycle.items[i], style: style),
         ),
         Cell(value: cycle.write, style: style),
       ],

@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:computer_system_software/domain/entities/tree.dart';
 import 'package:computer_system_software/library/lexical_analyzer/token.dart';
+import 'package:computer_system_software/library/painters/binary_tree_painter/tree.dart'
+    as painter;
+import 'package:equatable/equatable.dart';
 
 part 'indexed_tree.dart';
 
@@ -35,17 +38,17 @@ class ConveyorRepository {
     required ConveyorConfig config,
   }) : _config = config;
 
-  (List<Conveyor>, int, double, double)? execute(Tree? tree) {
+  (List<Conveyor>, int, double, double, IndexedTree)? execute(Tree? tree) {
     if (tree == null) return null;
     _reset();
-    Tree? newTree = tree.copyWith();
-    _removeLeaves(newTree);
-    _indexedTree = _makeIndexedTree(newTree);
+    _removeLeaves(tree);
+    _indexedTree = _makeIndexedTree(tree);
     if (_indexedTree == null) return null;
+    final indexedTree = _indexedTree!.copyWith();
     _linearTime = _calculateLinearTime(_indexedTree);
     _fillConveyors();
     _calculateCoefficients();
-    return (_conveyors, _realTime, _productivity, _efficient);
+    return (_conveyors, _realTime, _productivity, _efficient, indexedTree);
   }
 
   void _reset() {

@@ -40,7 +40,7 @@ class CellModel {
 }
 
 class Lab5Model extends ChangeNotifier {
-  Tree? _tree;
+  IndexedTree? _tree;
   String _data = '';
   bool _isVisibleTree = true;
   final List<Conveyor> _conveyors = [];
@@ -67,7 +67,7 @@ class Lab5Model extends ChangeNotifier {
     _conveyorRepository = ConveyorRepository(config: _conveyorConfig);
   }
 
-  Tree? get tree => _tree;
+  IndexedTree? get tree => _tree;
 
   bool get isVisibleTree => _isVisibleTree;
 
@@ -111,7 +111,7 @@ class Lab5Model extends ChangeNotifier {
       _operationColor[index] = color;
     }
     return CellModel(
-      value: _conveyorRepository.operationByIndex[index] ?? '',
+      value: '${_conveyorRepository.operationByIndex[index] ?? ''}[$index]',
       color: color,
     );
   }
@@ -137,13 +137,15 @@ class Lab5Model extends ChangeNotifier {
 
   void _buildConveyor() {
     List<Token> tokens = _expressionAnalyzerRepository.analyze(_data);
-    _tree = _expressionTreeRepository.build(tokens);
-    final result = _conveyorRepository.execute(_tree);
+    Tree? tree = _expressionTreeRepository.build(tokens);
+    final result = _conveyorRepository.execute(tree);
+    _conveyors.clear();
     _conveyors.addAll(result?.$1 ?? []);
     _metrics = Metrics(
       realTime: result?.$2 ?? 0,
       productivity: result?.$3 ?? 0,
       efficient: result?.$4 ?? 0,
     );
+    _tree = result?.$5;
   }
 }

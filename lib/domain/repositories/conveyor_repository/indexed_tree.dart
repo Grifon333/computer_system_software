@@ -1,18 +1,24 @@
 part of 'conveyor_repository.dart';
 
-class IndexedTree {
-  final Token root;
+class IndexedTree extends painter.Tree<Token> with EquatableMixin {
   int index;
-  IndexedTree? leftChild;
-  IndexedTree? rightChild;
 
   bool get isLeaf => leftChild == null && rightChild == null;
 
+  @override
+  IndexedTree? get leftChild => super.leftChild as IndexedTree?;
+
+  @override
+  IndexedTree? get rightChild => super.rightChild as IndexedTree?;
+
+  @override
+  String getRoot() => '$root [$index]';
+
   IndexedTree({
-    required this.root,
+    required super.root,
     required this.index,
-    this.leftChild,
-    this.rightChild,
+    super.leftChild,
+    super.rightChild,
   });
 
   void removeTreeByIndex(int index) {
@@ -46,4 +52,21 @@ class IndexedTree {
     }
     return list.join('\n');
   }
+
+  IndexedTree copyWith({
+    Token? root,
+    int? index,
+    IndexedTree? leftChild,
+    IndexedTree? rightChild,
+  }) {
+    return IndexedTree(
+      root: root ?? this.root,
+      index: index ?? this.index,
+      leftChild: leftChild ?? this.leftChild?.copyWith(),
+      rightChild: rightChild ?? this.rightChild?.copyWith(),
+    );
+  }
+
+  @override
+  List<Object?> get props => [root, index, leftChild, rightChild];
 }
