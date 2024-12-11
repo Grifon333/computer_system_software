@@ -5,7 +5,7 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const countLabs = 5;
+    const countLabs = 6;
 
     return Scaffold(
       body: SafeArea(
