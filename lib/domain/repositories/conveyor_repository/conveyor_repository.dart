@@ -40,9 +40,10 @@ class ConveyorRepository {
 
   (List<Conveyor>, int, double, double, IndexedTree)? execute(Tree? tree) {
     if (tree == null) return null;
+    final Tree newTree = tree.copyWith();
     _reset();
-    _removeLeaves(tree);
-    _indexedTree = _makeIndexedTree(tree);
+    _removeLeaves(newTree);
+    _indexedTree = _makeIndexedTree(newTree);
     if (_indexedTree == null) return null;
     final indexedTree = _indexedTree!.copyWith();
     _linearTime = _calculateLinearTime(_indexedTree);
@@ -94,7 +95,7 @@ class ConveyorRepository {
         _addConveyor();
         continue;
       }
-      leaves.sort(_compareOperationTimes);
+      _sortLeaves(leaves);
 
       while (leaves.isNotEmpty) {
         int operationIndex = leaves.removeLast().index;
@@ -129,8 +130,14 @@ class ConveyorRepository {
     _conveyors[_currentConveyor + _config.layersCount].write = operationIndex;
   }
 
-  int _compareOperationTimes(IndexedTree one, IndexedTree two) {
+  int _compareOperation(IndexedTree one, IndexedTree two) {
+    int compareLayer = one.layer - two.layer;
+    if (compareLayer != 0) return compareLayer;
     return _getOperationTime(one.root) - _getOperationTime(two.root);
+  }
+
+  void _sortLeaves(List<IndexedTree> leaves) {
+    leaves.sort(_compareOperation);
   }
 
   int _getOperationTime(Token? token) => switch (token?.value) {
@@ -157,13 +164,17 @@ class ConveyorRepository {
     if (r != null) r.isLeaf ? tree.rightChild = null : _removeLeaves(r);
   }
 
-  IndexedTree? _makeIndexedTree(Tree? tree) {
+  IndexedTree? _makeIndexedTree(Tree? tree, [int layer = 0]) {
     if (tree == null) return null;
-    IndexedTree indexTree = IndexedTree(root: tree.root, index: -1);
-    indexTree.leftChild = _makeIndexedTree(tree.leftChild);
+    IndexedTree indexTree = IndexedTree(
+      root: tree.root,
+      index: -1,
+      layer: layer,
+    );
+    indexTree.leftChild = _makeIndexedTree(tree.leftChild, layer + 1);
     indexTree.index = _index;
     _tokenByIndex.addAll({_index++: tree.root});
-    indexTree.rightChild = _makeIndexedTree(tree.rightChild);
+    indexTree.rightChild = _makeIndexedTree(tree.rightChild, layer + 1);
     return indexTree;
   }
 

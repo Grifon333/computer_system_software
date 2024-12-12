@@ -3,6 +3,8 @@ part of 'conveyor_repository.dart';
 class IndexedTree extends painter.Tree<Token> with EquatableMixin {
   int index;
 
+  int layer;
+
   bool get isLeaf => leftChild == null && rightChild == null;
 
   @override
@@ -17,6 +19,7 @@ class IndexedTree extends painter.Tree<Token> with EquatableMixin {
   IndexedTree({
     required super.root,
     required this.index,
+    required this.layer,
     super.leftChild,
     super.rightChild,
   });
@@ -43,7 +46,7 @@ class IndexedTree extends painter.Tree<Token> with EquatableMixin {
 
   String toTreeView([String tab = '']) {
     List<String> list = [];
-    list.add('${root.value} ($index)');
+    list.add('${root.value} ($index/$layer)');
     if (leftChild != null) {
       list.add('$tab|-l: ${leftChild?.toTreeView('$tab|$_gap')}');
     }
@@ -56,17 +59,19 @@ class IndexedTree extends painter.Tree<Token> with EquatableMixin {
   IndexedTree copyWith({
     Token? root,
     int? index,
+    int? layer,
     IndexedTree? leftChild,
     IndexedTree? rightChild,
   }) {
     return IndexedTree(
       root: root ?? this.root,
       index: index ?? this.index,
+      layer: layer ?? this.layer,
       leftChild: leftChild ?? this.leftChild?.copyWith(),
       rightChild: rightChild ?? this.rightChild?.copyWith(),
     );
   }
 
   @override
-  List<Object?> get props => [root, index, leftChild, rightChild];
+  List<Object?> get props => [root, index, layer, leftChild, rightChild];
 }
